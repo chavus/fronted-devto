@@ -201,6 +201,8 @@ $('#nav-tab').on('click',function(event){
 $('#search').on('search',function(event){
     location.href = `vistaBusqueda.html?busqueda=${$(this).val()}`
 })
+/*manejador de eventos de la busqueda (mobile vista busqueda)*/
+
 $('#searchMobile').on('search',function(event){
     location.href = `vistaBusqueda.html?busqueda=${$(this).val()}`
 })
