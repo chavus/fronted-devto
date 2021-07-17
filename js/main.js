@@ -1,8 +1,16 @@
 const endPoint = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
+const urlParams = new URLSearchParams(location.search);
+let busqueda = urlParams.get('busqueda');
 $(document).ready(function(){
-    printAllCards();
+
+    if(busqueda){
+        printAllCards(busqueda);    
+    }
+    else{
+        printAllCards();
+    }
 })
-function printAllCards(option=null){
+function printAllCards(option=null,order='desc'){
     $.get(endPoint+'/posts/.json', function(data, status){
         console.log("Data: " + data + "\nStatus: " + status);
        /* item.cover_image (imagen de fondo)
@@ -22,30 +30,39 @@ function printAllCards(option=null){
                 tagList:data[post].tag_list,
                 reading_time_minutes:data[post].reading_time_minutes,
                 created_at:data[post].created_at,
-                postId:post
+                postId:post,
+                tagString:data[post].tags
                 
             };
             posts.push(articulo);
         }
 
-        posts.sort(function(a,b){
-            return moment(new Date(b.created_at)).valueOf() - moment(new Date(a.created_at)).valueOf()
-        })
+        if(order=='desc'){
+            posts.sort(function(a,b){
+                return moment(new Date(b.created_at)).valueOf() - moment(new Date(a.created_at)).valueOf()
+            })
+        }
+        if(order=='asc'){
+            posts.sort(function(a,b){
+                return  moment(new Date(a.created_at)).valueOf() - moment(new Date(b.created_at)).valueOf()
+            })
+        }
         let printedArticles=0;
+
         for(let articulo of posts){
             let fecha = new Date(articulo.created_at)
             let today = new Date();
             let fechaMoment = moment(fecha)
             let todayMoment = moment(today) 
-
+            //creamos un string de busqueda.
+            let searchString = `${articulo.name} ${articulo.title} ${articulo.tagString}`.toLowerCase();
+            console.log(searchString);
             switch(option){
                 case null:
                     poblateCard(articulo)
-                    console.log(todayMoment.valueOf())
                     break;
                 case 'feed':
                     poblateCard(articulo)
-                    console.log(todayMoment.valueOf())
                     break;
                 case 'latest':
                     if(printedArticles==5){
@@ -54,7 +71,6 @@ function printAllCards(option=null){
                     poblateCard(articulo);
                     printedArticles++;
                     break;
-
                 case 'year':
                     if(fechaMoment.year() == todayMoment.year()){
                         poblateCard(articulo)
@@ -74,8 +90,13 @@ function printAllCards(option=null){
                             break;
                         }
                     }
-                
+                default:
+                    if(searchString.includes(option.toLowerCase())){
+                        poblateCard(articulo)
+                        break;
+                    }
             }
+
         }
         let firstCard = $('#nav-feed .card:first-child').find('img');
         firstCard.addClass('d-block');
@@ -143,7 +164,6 @@ function createCard(article){
 /*manejador de eventeos del filtro*/
 $('#nav-tab').on('click',function(event){
     let target = event.target;
-
     switch(target.id) {
         case 'feed':
             console.log('quieres traerte todos');
@@ -165,6 +185,24 @@ $('#nav-tab').on('click',function(event){
             console.log('quieres filtrar los del ano');
             printAllCards('year');
             break;
+        case 'newest':
+            console.log('quieres filtrar los del ano');
+            printAllCards(busqueda,'desc');
+            break;
+        case 'oldest':
+            console.log('quieres filtrar los del ano');
+            printAllCards(busqueda,'asc');
+            break;
     }
     
 })
+
+/*manejador de eventos de la busqueda*/
+$('#search').on('search',function(event){
+    location.href = `vistaBusqueda.html?busqueda=${$(this).val()}`
+})
+$('#searchMobile').on('search',function(event){
+    location.href = `vistaBusqueda.html?busqueda=${$(this).val()}`
+})
+
+
