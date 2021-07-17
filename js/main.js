@@ -1,5 +1,8 @@
 const endPoint = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
 $(document).ready(function(){
+    printAllCards();
+})
+function printAllCards(option=null){
     $.get(endPoint+'/posts/.json', function(data, status){
         console.log("Data: " + data + "\nStatus: " + status);
        /* item.cover_image (imagen de fondo)
@@ -7,7 +10,8 @@ $(document).ready(function(){
           item.user.name (nombre de usuario)
           item.title (titulo del post)
           item.tag-list (tag list)*/
-          $('#nav-feed').empty();//limpiamos los post antes de iterar
+        $('#nav-feed').empty();//limpiamos los post antes de iterar
+        let posts = [];
         for(let post in data){
             let articulo = {
                 cover:data[post].cover_image,
@@ -16,25 +20,81 @@ $(document).ready(function(){
                 readable_publish:data[post].readable_publish_date,
                 title:data[post].title,
                 tagList:data[post].tag_list,
-                reading_time_minutes:data[post].reading_time_minutes
+                reading_time_minutes:data[post].reading_time_minutes,
+                created_at:data[post].created_at,
+                postId:post
+                
             };
-            console.log(articulo);
-            $('#nav-feed').append(createCard(articulo));
-           let tags = $('#nav-feed .card:last-child').find('.card-post-tags')
-           /*iteramos sobre el tagList para imprimir todos los tags */
-           if(articulo.tagList){
-                articulo.tagList.forEach(tag=>{
-                    tags.append(`<a>#${tag}<a/>`)
-                })
-           }
+            posts.push(articulo);
+        }
+
+        posts.sort(function(a,b){
+            return moment(new Date(b.created_at)).valueOf() - moment(new Date(a.created_at)).valueOf()
+        })
+        let printedArticles=0;
+        for(let articulo of posts){
+            let fecha = new Date(articulo.created_at)
+            let today = new Date();
+            let fechaMoment = moment(fecha)
+            let todayMoment = moment(today) 
+
+            switch(option){
+                case null:
+                    poblateCard(articulo)
+                    console.log(todayMoment.valueOf())
+                    break;
+                case 'feed':
+                    poblateCard(articulo)
+                    console.log(todayMoment.valueOf())
+                    break;
+                case 'latest':
+                    if(printedArticles==5){
+                        return;
+                    }
+                    poblateCard(articulo);
+                    printedArticles++;
+                    break;
+
+                case 'year':
+                    if(fechaMoment.year() == todayMoment.year()){
+                        poblateCard(articulo)
+                        break;
+                    }
+                case 'month':
+                    if(fechaMoment.year() == todayMoment.year()){
+                        if(fechaMoment.month() == todayMoment.month()){
+                            poblateCard(articulo)
+                            break;
+                        }
+                    }
+                case 'week':
+                    if(fechaMoment.year() == todayMoment.year()){
+                        if(fechaMoment.isoWeek() == todayMoment.isoWeek()){
+                            poblateCard(articulo)
+                            break;
+                        }
+                    }
+                
+            }
         }
         let firstCard = $('#nav-feed .card:first-child').find('img');
         firstCard.addClass('d-block');
     });
-})
+}
+
+function poblateCard(article){
+    $('#nav-feed').append(createCard(article));
+    let tags = $('#nav-feed .card:last-child').find('.card-post-tags')
+    /*iteramos sobre el tagList para imprimir todos los tags */
+    if(article.tagList){
+         article.tagList.forEach(tag=>{
+             tags.append(`<a>#${tag}<a/>`)
+         })
+    }
+}
 
 function createCard(article){
-    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes} = article;
+    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId} = article;
     let templateCard = `<div class="card br-post post-card featured-post-card">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
@@ -43,10 +103,12 @@ function createCard(article){
                             <div class="d-flex c-name">
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
+                                <p>${new Date(created_at)}</p>
+
                             </div>
                         </div>
                         <div class="card-content pl-5 pt-2">
-                            <a href="index2.html" class="post-list">
+                            <a href="post_detail.html?key=${postId}" class="post-list">
                             <h4 class="card-title">${title}</h4>
                             </a>
                         <div class="d-flex h-order">
@@ -78,4 +140,31 @@ function createCard(article){
     </div>`
     return templateCard;
 }
+/*manejador de eventeos del filtro*/
+$('#nav-tab').on('click',function(event){
+    let target = event.target;
 
+    switch(target.id) {
+        case 'feed':
+            console.log('quieres traerte todos');
+            printAllCards('feed');
+            break;
+        case 'latest':
+            console.log('quieres filtrar los ultimos 5');
+            printAllCards('latest');
+            break;
+        case 'week':
+            console.log('quieres filtrar los de las semana');
+            printAllCards('week');
+            break;
+        case 'month':
+            console.log('quieres filtrar los del mes');
+            printAllCards('month');
+            break;
+        case 'year':
+            console.log('quieres filtrar los del ano');
+            printAllCards('year');
+            break;
+    }
+    
+})
