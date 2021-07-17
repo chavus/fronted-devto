@@ -1,4 +1,5 @@
-const endPoint = 'https://miproyecto-jorge-default-rtdb.firebaseio.com/posts/.json'
+const endPoint = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
+
 $(document).ready(function(){
     $.get(endPoint, function(data, status){
         console.log("Data: " + data + "\nStatus: " + status);
@@ -20,7 +21,7 @@ let plantillaCard = `<div class="card br-post post-card featured-post-card">
                             </div>
                         </div>
                         <div class="card-content pl-5 pt-2">
-                            <a href="index2.html" class="post-list">
+                            <a href="index2.html"  class="post-list">
                             <h4 class="card-title">Data visualization: Creating charts using REST API's in React.js</h4>
                             </a>
                         <div class="d-flex h-order">
@@ -54,3 +55,5 @@ let plantillaCard = `<div class="card br-post post-card featured-post-card">
     </div>
 </div>
 </div>`
+
+
