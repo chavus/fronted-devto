@@ -41,7 +41,7 @@
 						</div>
 						<!--aqui esta el input de busqueda-->
 						<form class="seach">
-							<input id="search" class="form-control " type="search" placeholder="Search..."
+							<input id="searchMobile" class="form-control " type="search" placeholder="Search..."
 								aria-label="Search...">
 						</form>
 						<div class="navbar-right d-flex  align-items-center">
@@ -167,85 +167,28 @@
 	
 
 	<!--------------------------------------------------------------------------------------MAIN----------------------------------------------------------------->
-	<main class="container-xl custom-container">
+	<main class="container-sm custom-container">
 
 		<div class="row">
 			<!-------------------------------------------------------------------ASIDE LEFT----------------------------------------------------------------------------------------->
-			<aside class="d-none d-md-block col-sm-4 col-xl-3">
-				<nav class="d-flex icons section-list collapse" id="section-list" aria-expanded="false">
-					<a href="#" class="item-list">
-						<span><img src="img/icons/home.svg" alt=""></span>Home</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/readinglist.svg" alt=""></span>Reading List</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/listings.svg" alt=""></span>Listings</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/podcasts.svg" alt=""></span>Podcasts</a>
-					<a href="#" class="item-list">
-						<span class="crayons-icon crayons-icon--default"><img src="img/icons/videos.svg"
-								alt=""></span>Videos</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/tags.svg" alt=""></span>Tags</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/code-of-conduct.svg" alt=""></span>Code of Coduct</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/faq.svg" alt=""></span>FAQ</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/dev-shop.svg" alt=""></span>DEV Shop</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/about.svg" alt=""></span>About</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/privacy-policy.svg" alt=""></span>Privacy Policy</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/terms-of-use.svg" alt=""></span>Terms of use</a>
-					<a href="#" class="item-list">
-						<span><img src="img/icons/contact.svg" alt=""></span>Contact</a>
-					<div class="mt-5 social-icons mb-5"> 
-							<a href="https://twitter.com/thepracticaldev" target="_blank"
-								class="" rel="noopener">
-								<img src="img/icons/twitter.svg" alt="twitter">
-							</a>
-							<a href="https://facebook.com/thepracticaldev" target="_blank">
-								<img src="img/icons/facebook.svg" alt="facebook">
-							</a>
-							<a href="https://github.com/thepracticaldev" target="_blank">
-								<img src="img/icons/github.svg" alt="github">
-							</a>
-							<a href="https://instagram.com/thepracticaldev" target="_blank"
-								class="crayons-link crayons-link--secondary mx-2" rel="noopener">
-								<img src="img/icons/instagram.svg" alt="instagram">
-							</a>
-							<a href="https://twitch.com/thepracticaldev" target="_blank"
-								class="crayons-link crayons-link--secondary mx-2" rel="noopener">
-								<img src="img/icons/twitch.svg" alt="twitch">
-			
-							</a>
-						</div>	
-				</nav>
-				<div class="view-more-sections">
-					<button data-toggle="collapse" data-target="#section-list">More...</button>
-				</div>
-				<div class="mt-3 tags">
-					<div class="d-flex tag-header">
-						<h5>My Tags</h5>
-					   <img src="images/aside1/losbuenos/engrande.svg" alt="#">
-					</div>
-					<nav class="d-flex icons section-list">
-					  <a href="#" class="item-list">#javascript</a>
-					  <a href="#" class="item-list">#css</a>
-					  <a href="#" class="item-list">#dotnet</a>
-					  <a href="#" class="item-list">#npm</a>
-
-					 </nav>
-				  </div>
-				
-				<div class="a-l-card mt-5">
-					<img class="ad-img-left" src="img/photos/ads.png" alt="aside-ad">
-					<p class="a-l-txt-color">Do you have your <br>sticker pack yet?</p>
-				</div>
+			<aside class="d-md-block  col-12 col-md-4 col-lg-3 ">
+			<!--aqui esta el input de busqueda-->
+                <form class="seach d-md-none">
+                    <input id="search" class="form-control " type="search" placeholder="Search..."
+                        aria-label="Search...">
+                </form>
+                <h2 class="font-weight-bold text-center">Search results</h2>
+                <ul class="d-flex icons section-list collapse ml-n5 ml-md-0 " id="section-list" aria-expanded="false">
+					<a href="#" class="item-list  list-group-item-light">Posts</a>
+					<a href="#" class="item-list">Podcasts</a>
+					<a href="#" class="item-list">People</a>
+					<a href="#" class="item-list">Comments</a>
+					<a href="#" class="item-list">My posts only</a>
+					
+                </ul>
 			</aside>
 			<!------------------------------------------------------------------------MAIN CARDS--------------------------------------------------------------------------->
-			<section class="col-12 col-md-8 col-xl-6 cards-section">
+			<section class="col-12 col-md-7 col-lg-8 cards-section  ">
 
 				<nav class="cards-navigation">
 					<div class="title">
@@ -253,17 +196,12 @@
 					</div>
 					<div class="nav nav-tabs" id="nav-tab" role="tablist">
 						<a class="nav-link active" id="feed" data-toggle="tab" href="#nav-feed"
-							role="tab" aria-controls="nav-feed" aria-selected="true">Feed</a>
-						<a class="nav-link" id="week" data-toggle="tab" href="#nav-week"
-							role="tab" aria-controls="nav-week" aria-selected="false">Week</a>
-						<a class="nav-link" id="month" data-toggle="tab" href="#nav-month"
-							role="tab" aria-controls="nav-month" aria-selected="false">Month</a>
-						<a class="nav-link" id="year" data-toggle="tab" href="#nav-1" role="tab"
-					    aria-controls="nav-contact" aria-selected="false">Year</a>
-					<a class="nav-link" id="nav-2" data-toggle="tab" href="#nav-2" role="tab"
-					    aria-controls="nav-contact" aria-selected="false">Infinity</a>
-					<a class="nav-link" id="latest" data-toggle="tab" href="#nav-3" role="tab"
-					    aria-controls="nav-contact" aria-selected="false">Latest</a>
+							role="tab" aria-controls="nav-feed" aria-selected="true">Most Relevant</a>
+						<a class="nav-link" id="newest" data-toggle="tab" href="#nav-week"
+							role="tab" aria-controls="nav-week" aria-selected="false">Newest</a>
+						<a class="nav-link" id="oldest" data-toggle="tab" href="#nav-month"
+							role="tab" aria-controls="nav-month" aria-selected="false">Oldest</a>
+
 					</div>
 				</nav>
 				<div class="tab-content" id="nav-tabContent">
@@ -2178,7 +2116,7 @@
 				</div>
 			</section>
 			<!------------------------------------------------------------------ ASIDE RIGHT---------------------------------------------------------------------->
-			<aside class="d-none d-xl-block col-xl-3">
+			<!--<aside class="d-none d-xl-block col-xl-3">
 				<div class="card div-card mt-2">
 					<img class="img-aside-right" src="img/photos/changelog.png" alt="changelog">
 					<div class="card-body">
@@ -2311,7 +2249,7 @@
 					</ul>
 				</div>
 			</aside>
-		</div>
+		</div>-->
 	</main>
 
 	<!--------------------------------------------------------------------------FOOTER--------------------------------------------------------------------------->
