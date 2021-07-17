@@ -59,6 +59,7 @@
     ],
     "content": "Dummy content", // Added by team
     "created_at": "2019-10-24T13:41:29Z",
+    "readable_publish_date": "Oct 24",
     "positive_reactions_count": 12,
     "reading_time_minutes": 15,
     "user": {
