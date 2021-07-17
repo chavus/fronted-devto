@@ -108,13 +108,8 @@ function createCard(article){
                             </div>
                         </div>
                         <div class="card-content pl-5 pt-2">
-<<<<<<< HEAD
-                            <a href="index2.html"  class="post-list">
-                            <h4 class="card-title">Data visualization: Creating charts using REST API's in React.js</h4>
-=======
                             <a href="post_detail.html?key=${postId}" class="post-list">
                             <h4 class="card-title">${title}</h4>
->>>>>>> a764c37d76b39345f26bc96b2d63b706f5ffc7bd
                             </a>
                         <div class="d-flex h-order">
                             <nav class="card-post-tags">
@@ -141,13 +136,6 @@ function createCard(article){
                 </div>
             </div>
         </div>
-<<<<<<< HEAD
-    </div>
-</div>
-</div>`
-
-
-=======
         </div>
     </div>`
     return templateCard;
@@ -180,4 +168,3 @@ $('#nav-tab').on('click',function(event){
     }
     
 })
->>>>>>> a764c37d76b39345f26bc96b2d63b706f5ffc7bd
