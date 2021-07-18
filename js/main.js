@@ -1,11 +1,16 @@
 const endPoint = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
+/*claves del queryString*/
 const urlParams = new URLSearchParams(location.search);
+/*cunado buscamos nos redirigimos a la vista de busqueda y pasamos el parametro
+de busqueda a travez de la url */
 let busqueda = urlParams.get('busqueda');
 $(document).ready(function(){
-
+    /*si existe un parametro de busqueda en la URL imprimimos los post cuyo
+    searchString incluya dicho parameto */
     if(busqueda){
         printAllCards(busqueda);    
     }
+    /*de lo conrtrario imprimimos todos los post*/
     else{
         printAllCards();
     }
@@ -13,58 +18,75 @@ $(document).ready(function(){
 function printAllCards(option=null,order='desc'){
     $.get(endPoint+'/posts/.json', function(data, status){
         console.log("Data: " + data + "\nStatus: " + status);
-       /* item.cover_image (imagen de fondo)
-          item.user.porfile_image_90 (imagen de usuario redonda)
-          item.user.name (nombre de usuario)
-          item.title (titulo del post)
-          item.tag-list (tag list)*/
-        $('#nav-feed').empty();//limpiamos los post antes de iterar
+        /*vaciamos al contenedor padre antes de renderizar*/
+        $('#nav-feed').empty();
+        /*creamos un arreglo vacio donde pondremos los datos
+        que necesitamos para pintar nuestros posts*/
         let posts = [];
+        /*consultamos los comentarios asincronamente y los guardamos 
+        en un arreglo*/
         let comments = bringComments();
+        /*iteramos sobre el el objeto que nos traimos de nuestra api*/
         for(let post in data){
             let articulo = {
+                /*imagen de la parte superir del post*/
                 cover:data[post].cover_image,
+                /*avatar del usuario*/
                 user:data[post].user.profile_image_90,
+                /*nombre del usuario*/
                 name:data[post].user.name,
+                /*fecha de publicacion (formato corto)*/
                 readable_publish:data[post].readable_publish_date,
+                /*titulo del post*/
                 title:data[post].title,
+                /*arreglo con los tags*/
                 tagList:data[post].tag_list,
+                /*tiempo de lectura*/
                 reading_time_minutes:data[post].reading_time_minutes,
+                /*fecha de publicacion (formato largo)*/
                 created_at:data[post].created_at,
+                /*clave de nuestro post en nuetria API*/
                 postId:post,
+                /*string con los tags*/
                 tagString:data[post].tags,
+                /*comentarios de cada post*/
                 comments:comments.filter(item=>item.postId == post)
             };
             posts.push(articulo);
             console.log(articulo);
         }
-
+        /*si argumento order es el parametro 'desc', ordenamos los post del mas reciente al mas viejo*/
         if(order=='desc'){
             posts.sort(function(a,b){
                 return moment(new Date(b.created_at)).valueOf() - moment(new Date(a.created_at)).valueOf()
             })
         }
+        /*si argumento order es el parametro 'asc', ordenamos los post del mas viejo al mas reciente*/
+
         if(order=='asc'){
             posts.sort(function(a,b){
                 return  moment(new Date(a.created_at)).valueOf() - moment(new Date(b.created_at)).valueOf()
             })
         }
         let printedArticles=0;
-
         for(let articulo of posts){
+            /*utilizamos la libreria moment para poder realizar los filtros*/
             let fecha = new Date(articulo.created_at)
             let today = new Date();
             let fechaMoment = moment(fecha)
             let todayMoment = moment(today) 
-            //creamos un string de busqueda.
+            /*creamos un string de busqueda contatenando en minusculas:
+            el nombre del autor del post,el titulo del post y el tagString*/
             let searchString = `${articulo.name} ${articulo.title} ${articulo.tagString}`.toLowerCase();
             switch(option){
+                /*imprimimos todos los post del mas reciente al mas viejo*/
                 case null:
                     poblateCard(articulo)
                     break;
                 case 'feed':
                     poblateCard(articulo)
                     break;
+                /*imprimimos los 5 primeros post */
                 case 'latest':
                     if(printedArticles==5){
                         let firstCard = $('#nav-feed .card:first-child').find('img');
@@ -74,11 +96,13 @@ function printAllCards(option=null,order='desc'){
                     poblateCard(articulo);
                     printedArticles++;
                     break;
+                /*imprimimos todos los post que sean del ano actual*/
                 case 'year':
                     if(fechaMoment.year() == todayMoment.year()){
                         poblateCard(articulo)
                         break;
                     }
+                /*imprimimos todos los post que sean del ano actual y el mes actual*/
                 case 'month':
                     if(fechaMoment.year() == todayMoment.year()){
                         if(fechaMoment.month() == todayMoment.month()){
@@ -87,6 +111,7 @@ function printAllCards(option=null,order='desc'){
                         }
                     }
                 case 'week':
+                /*imprimimos todos los post que sean del ano actual y la semana actual*/
                     if(fechaMoment.year() == todayMoment.year()){
                         if(fechaMoment.isoWeek() == todayMoment.isoWeek()){
                             poblateCard(articulo)
@@ -94,6 +119,8 @@ function printAllCards(option=null,order='desc'){
                         }
                     }
                 default:
+                /*el argumento option tambien puede recibir un string que representa
+                una palabra que buscaremos en el searchString*/
                     if(searchString.includes(option.toLowerCase())){
                         poblateCard(articulo)
                         break;
@@ -101,23 +128,29 @@ function printAllCards(option=null,order='desc'){
             }
 
         }
+        /*una vez renderizadas todos los post mostramos el cover del primer post*/
         let firstCard = $('#nav-feed .card:first-child').find('img');
         firstCard.addClass('d-block');
     });
 }
 
 function poblateCard(article){
-    $('#nav-feed').append(createCard(article));
+    /*creamos un string con el formato del post y lo populamos con los datos
+    del objeto que recibe la funcion como argumento*/
+    let newCard = createCard(article);
+    /*lo agregamos al contenedor padre*/
+    $('#nav-feed').append(newCard);
     let tags = $('#nav-feed .card:last-child').find('.card-post-tags')
     /*iteramos sobre el tagList para imprimir todos los tags */
     if(article.tagList){
-         article.tagList.forEach(tag=>{
-             tags.append(`<a>#${tag}<a/>`)
-         })
+        article.tagList.forEach(tag=>{
+            tags.append(`<a>#${tag}<a/>`)
+        })
     }
 }
 
 function createCard(article){
+    /*string con el formato del post*/
     let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments} = article;
     let templateCard = `<div class="card br-post post-card featured-post-card">
                         <img src=${cover} class="card-img-top d-none" alt="...">
@@ -164,53 +197,43 @@ function createCard(article){
     </div>`
     return templateCard;
 }
-/*manejador de eventeos del filtro*/
+/*manejador de eventos del filtro*/
 $('#nav-tab').on('click',function(event){
     let target = event.target;
     switch(target.id) {
         case 'feed':
-            console.log('quieres traerte todos');
             printAllCards('feed');
             break;
         case 'latest':
-            console.log('quieres filtrar los ultimos 5');
             printAllCards('latest');
             break;
         case 'week':
-            console.log('quieres filtrar los de las semana');
             printAllCards('week');
             break;
         case 'month':
-            console.log('quieres filtrar los del mes');
             printAllCards('month');
             break;
         case 'year':
-            console.log('quieres filtrar los del ano');
             printAllCards('year');
             break;
         case 'newest':
-            console.log('quieres filtrar los primeros');
             printAllCards(busqueda,'desc');
             break;
         case 'oldest':
-            console.log('quieres filtrar los ultimos');
             printAllCards(busqueda,'asc');
             break;
     }
     
 })
-
 /*manejador de eventos de la busqueda*/
 $('#search').on('search',function(event){
     location.href = `vistaBusqueda.html?busqueda=${$(this).val()}`
 })
 /*manejador de eventos de la busqueda (mobile vista busqueda)*/
-
 $('#searchMobile').on('search',function(event){
     location.href = `vistaBusqueda.html?busqueda=${$(this).val()}`
 })
-
-
+/*funcion para traer comentarios de manera sincrona*/
 function bringComments(){
     let commentsObject;
     $.ajax({
@@ -224,7 +247,7 @@ function bringComments(){
     let commentsArray = Object.values(commentsObject)
     return commentsArray;
 }
-
+/*funcion para crear comentarios*/
 function createCommentary(postId,author,content){
     $.ajax({
         method:'POST',
