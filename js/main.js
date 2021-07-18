@@ -8,7 +8,7 @@ $(document).ready(function(){
     /*si existe un parametro de busqueda en la URL imprimimos los post cuyo
     searchString incluya dicho parameto */
     if(busqueda){
-        printAllCards(busqueda,'relevance');    
+        printAllCardsSearch(busqueda,'relevance');    
     }
     /*de lo conrtrario imprimimos todos los post*/
     else{
@@ -17,7 +17,7 @@ $(document).ready(function(){
 })
 function printAllCards(option=null,order='desc'){
     $.get(endPoint+'/posts/.json', function(data, status){
-        console.log("Data: " + data + "\nStatus: " + status);
+        /*console.log("Data: " + data + "\nStatus: " + status);*/
         /*creamos un arreglo vacio donde pondremos los datos
         que necesitamos para pintar nuestros posts*/
         let posts = [];
@@ -42,7 +42,7 @@ function printAllCards(option=null,order='desc'){
                 /*tiempo de lectura*/
                 reading_time_minutes:data[post].reading_time_minutes,
                 /*fecha de publicacion (formato largo)*/
-                created_at:data[post].created_at,
+                published_timestamp:data[post].published_timestamp,
                 /*clave de nuestro post en nuetria API*/
                 postId:post,
                 /*string con los tags*/
@@ -58,13 +58,13 @@ function printAllCards(option=null,order='desc'){
         /*si argumento order es el parametro 'desc', ordenamos los post del mas reciente al mas viejo*/
         if(order=='desc'){
             posts.sort(function(a,b){
-                return moment(new Date(b.created_at)).valueOf() - moment(new Date(a.created_at)).valueOf()
+                return moment(new Date(b.published_timestamp)).valueOf() - moment(new Date(a.published_timestamp)).valueOf()
             })
         }
         /*si argumento order es el parametro 'asc', ordenamos los post del mas viejo al mas reciente*/
         if(order=='asc'){
             posts.sort(function(a,b){
-                return  moment(new Date(a.created_at)).valueOf() - moment(new Date(b.created_at)).valueOf()
+                return  moment(new Date(a.published_timestamp)).valueOf() - moment(new Date(b.published_timestamp)).valueOf()
             })
         }
         /*ordenamos por relevancia*/
@@ -78,7 +78,7 @@ function printAllCards(option=null,order='desc'){
         let printedArticles=0;
         for(let articulo of posts){
             /*utilizamos la libreria moment para poder realizar los filtros*/
-            let fecha = new Date(articulo.created_at)
+            let fecha = new Date(articulo.published_timestamp)
             let today = new Date();
             let fechaMoment = moment(fecha)
             let todayMoment = moment(today) 
@@ -120,21 +120,18 @@ function printAllCards(option=null,order='desc'){
                 case 'week':
                 /*imprimimos todos los post que sean del ano actual y la semana actual*/
                     if(fechaMoment.year() == todayMoment.year()){
-                        if(fechaMoment.isoWeek() == todayMoment.isoWeek()){
-                            poblateCard(articulo)
-                            break;
+                        if(fechaMoment.month() == todayMoment.month()){
+                            if(fechaMoment.isoWeek() == todayMoment.isoWeek()){
+                                console.log("la fecha del articulo es: ",fechaMoment);
+                                console.log("la fecha de hoy es: ",todayMoment);
+                                poblateCard(articulo)
+                                break;
+                            }
                         }
                     }
-                default:
-                /*el argumento option tambien puede recibir un string que representa
-                una palabra que buscaremos en el searchString*/
-                    if(searchString.includes(option.toLowerCase())){
-                        poblateCard(articulo)
-                        break;
-                    }
-            }
-
-        }
+                }
+            }            
+        
         /*una vez renderizadas todos los post mostramos el cover del primer post*/
         let firstCard = $('#nav-feed .card:first-child').find('img');
         firstCard.addClass('d-block');
@@ -158,7 +155,7 @@ function poblateCard(article){
 
 function createCard(article){
     /*string con el formato del post*/
-    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments,positives} = article;
+    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives} = article;
     let templateCard = `<div class="card br-post post-card featured-post-card ">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
@@ -167,7 +164,7 @@ function createCard(article){
                             <div class="d-flex c-name">
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
-                                <p>${new Date(created_at)}</p>
+                                <p>${new Date(published_timestamp)}</p>
                                 <p>positivos: ${positives}</p>
 
                             </div>
@@ -225,13 +222,13 @@ $('#nav-tab').on('click',function(event){
             printAllCards('year');
             break;
         case 'newest':
-            printAllCards(busqueda,'desc');
+            printAllCardsSearch(busqueda,'desc');
             break;
         case 'oldest':
-            printAllCards(busqueda,'asc');
+            printAllCardsSearch(busqueda,'asc');
             break;
         case 'relevance':
-            printAllCards(busqueda,'relevance');
+            printAllCardsSearch(busqueda,'relevance');
             break;
     }
     
@@ -269,4 +266,79 @@ function createCommentary(postId,author,content){
         },
         async: true
     });
+}
+
+
+function bringPosts(){
+    $.ajax({
+        method:'GET',
+        url:endPoint+'/posts/.json',
+        success: function (result) {
+            commentsObject = result;
+        },
+        async: false
+    });
+    let comments = bringComments();
+    let commentsMatrix = Object.entries(commentsObject);
+    let commentsArray = commentsMatrix.map(post=>{
+        return {
+            cover:post[1].cover_image,
+            /*avatar del usuario*/
+            user:post[1].user.profile_image_90,
+            /*nombre del usuario*/
+            name:post[1].user.name,
+            /*fecha de publicacion (formato corto)*/
+            readable_publish:post[1].readable_publish_date,
+            /*titulo del post*/
+            title:post[1].title,
+            /*arreglo con los tags*/
+            tagList:post[1].tag_list,
+            /*tiempo de lectura*/
+            reading_time_minutes:post[1].reading_time_minutes,
+            /*fecha de publicacion (formato largo)*/
+            published_timestamp:post[1].published_timestamp,
+            /*clave de nuestro post en nuetria API*/
+            postId:post[0],
+            /*string con los tags*/
+            tagString:post[1].tags,
+            /*comentarios de cada post*/
+            comments:comments.filter(item=>item.postId == post[0]),
+            /*respuestas positivas al post*/
+            /*este criterio de orden es tentativo (puede cambiar despues)*/
+            positives:post[1].positive_reactions_count,
+            searchString:`${post[1].user.name} ${post[1].tags} ${post[1].title}`.toLowerCase()
+        }
+    })
+    return commentsArray;
+}
+
+function printAllCardsSearch(busqueda,order='desc'){
+    let posts = bringPosts();
+    let postFiltrados = posts.filter(post =>{
+        return post.searchString.includes(busqueda.toLowerCase());
+    }
+    )
+/*si argumento order es el parametro 'desc', ordenamos los post del mas reciente al mas viejo*/
+    if(order=='desc'){
+        postFiltrados.sort(function(a,b){
+            return moment(new Date(b.published_timestamp)).valueOf() - moment(new Date(a.published_timestamp)).valueOf()
+            })
+        }
+/*si argumento order es el parametro 'asc', ordenamos los post del mas viejo al mas reciente*/
+    if(order=='asc'){
+        postFiltrados.sort(function(a,b){
+            return  moment(new Date(a.published_timestamp)).valueOf() - moment(new Date(b.published_timestamp)).valueOf()
+        })
+    }
+/*ordenamos por relevancia*/
+    if(order=='relevance'){
+        postFiltrados.sort(function(a,b){
+            return b.positives - a.positives;
+        })
+    }
+    $('#nav-feed').empty();
+    postFiltrados.forEach(post=>poblateCard(post))
+    let firstCard = $('#nav-feed .card:first-child').find('img');
+    firstCard.addClass('d-block');
+    return postFiltrados;
 }
