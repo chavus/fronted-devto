@@ -8,7 +8,7 @@ $(document).ready(function(){
     /*si existe un parametro de busqueda en la URL imprimimos los post cuyo
     searchString incluya dicho parameto */
     if(busqueda){
-        printAllCards(busqueda);    
+        printAllCards(busqueda,'relevance');    
     }
     /*de lo conrtrario imprimimos todos los post*/
     else{
@@ -158,7 +158,7 @@ function poblateCard(article){
 
 function createCard(article){
     /*string con el formato del post*/
-    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments} = article;
+    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments,positives} = article;
     let templateCard = `<div class="card br-post post-card featured-post-card ">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
@@ -168,6 +168,7 @@ function createCard(article){
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
                                 <p>${new Date(created_at)}</p>
+                                <p>positivos: ${positives}</p>
 
                             </div>
                         </div>
@@ -228,6 +229,9 @@ $('#nav-tab').on('click',function(event){
             break;
         case 'oldest':
             printAllCards(busqueda,'asc');
+            break;
+        case 'relevance':
+            printAllCards(busqueda,'relevance');
             break;
     }
     
