@@ -1005,4 +1005,63 @@ span {
     margin-left: 0px;
   }
 }
+
+/** ---------------------CREATE NEW POST---------------------*/
+main {
+  background-color: #eef0f1;
+}
+
+main .create-post-inner {
+  max-width: 1280px;
+}
+
+main .create-post-inner .header-nav-container .logo-wrapper {
+  height: 50px;
+  width: 40px;
+}
+
+main .create-post-inner .header-nav-container .nav-buttons-wrapper ul li {
+  list-style: none;
+  -webkit-transition-duration: 0.3s;
+          transition-duration: 0.3s;
+}
+
+main .create-post-inner .header-nav-container .nav-buttons-wrapper ul li:hover {
+  background-color: lavender;
+  border-radius: 5px;
+}
+
+main .create-post-inner .header-nav-container .nav-buttons-wrapper ul li button:hover {
+  color: #3b49df;
+}
+
+.btn-create-post {
+  height: 40px;
+  white-space: nowrap;
+  margin-left: 10px;
+  font-weight: 600;
+  border: none;
+  background-color: #323ebe;
+}
+
+.btn-create-post:hover {
+  background-color: #2d37aa;
+}
+
+@media (min-width: 375px) {
+  .button-tittle-wrapper {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .header-wrapper {
+    -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+  }
+  .button-title-wrapper {
+    display: block;
+  }
+}
 /*# sourceMappingURL=style.css.map */
