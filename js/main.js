@@ -20,6 +20,7 @@ function printAllCards(option=null,order='desc'){
           item.tag-list (tag list)*/
         $('#nav-feed').empty();//limpiamos los post antes de iterar
         let posts = [];
+        let comments = bringComments();
         for(let post in data){
             let articulo = {
                 cover:data[post].cover_image,
@@ -31,10 +32,11 @@ function printAllCards(option=null,order='desc'){
                 reading_time_minutes:data[post].reading_time_minutes,
                 created_at:data[post].created_at,
                 postId:post,
-                tagString:data[post].tags
-                
+                tagString:data[post].tags,
+                comments:comments.filter(item=>item.postId == post)
             };
             posts.push(articulo);
+            console.log(articulo);
         }
 
         if(order=='desc'){
@@ -56,7 +58,6 @@ function printAllCards(option=null,order='desc'){
             let todayMoment = moment(today) 
             //creamos un string de busqueda.
             let searchString = `${articulo.name} ${articulo.title} ${articulo.tagString}`.toLowerCase();
-            console.log(searchString);
             switch(option){
                 case null:
                     poblateCard(articulo)
@@ -66,6 +67,8 @@ function printAllCards(option=null,order='desc'){
                     break;
                 case 'latest':
                     if(printedArticles==5){
+                        let firstCard = $('#nav-feed .card:first-child').find('img');
+                        firstCard.addClass('d-block');
                         return;
                     }
                     poblateCard(articulo);
@@ -115,7 +118,7 @@ function poblateCard(article){
 }
 
 function createCard(article){
-    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId} = article;
+    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments} = article;
     let templateCard = `<div class="card br-post post-card featured-post-card">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
@@ -148,7 +151,7 @@ function createCard(article){
                             d="M10.5 5h3a6 6 0 110 12v2.625c-3.75-1.5-9-3.75-9-8.625a6 6 0 016-6zM12 15.5h1.5a4.501 4.501 0 001.722-8.657A4.5 4.5 0 0013.5 6.5h-3A4.5 4.5 0 006 11c0 2.707 1.846 4.475 6 6.36V15.5z">
                         </path>
                     </svg>
-                    <button class="comment">Add comment</button>
+                    <button class="comment"><span>${comments.length}</span> comment</button>
                     </div>
                     <div class="d-flex">
                     <p class="card-text mb-0"><small class="text-muted">${reading_time_minutes}
@@ -186,11 +189,11 @@ $('#nav-tab').on('click',function(event){
             printAllCards('year');
             break;
         case 'newest':
-            console.log('quieres filtrar los del ano');
+            console.log('quieres filtrar los primeros');
             printAllCards(busqueda,'desc');
             break;
         case 'oldest':
-            console.log('quieres filtrar los del ano');
+            console.log('quieres filtrar los ultimos');
             printAllCards(busqueda,'asc');
             break;
     }
@@ -208,3 +211,28 @@ $('#searchMobile').on('search',function(event){
 })
 
 
+function bringComments(){
+    let commentsObject;
+    $.ajax({
+        method:'GET',
+        url:endPoint+'/comments/.json',
+        success: function (result) {
+            commentsObject = result;
+        },
+        async: false
+    });
+    let commentsArray = Object.values(commentsObject)
+    return commentsArray;
+}
+
+function createCommentary(postId,author,content){
+    $.ajax({
+        method:'POST',
+        url:endPoint+'/comments/.json',
+        data:JSON.stringify({postId,author,content}),
+        success: function (result) {
+            console.log(result);
+        },
+        async: true
+    });
+}
