@@ -18,8 +18,6 @@ $(document).ready(function(){
 function printAllCards(option=null,order='desc'){
     $.get(endPoint+'/posts/.json', function(data, status){
         console.log("Data: " + data + "\nStatus: " + status);
-        /*vaciamos al contenedor padre antes de renderizar*/
-        $('#nav-feed').empty();
         /*creamos un arreglo vacio donde pondremos los datos
         que necesitamos para pintar nuestros posts*/
         let posts = [];
@@ -52,6 +50,7 @@ function printAllCards(option=null,order='desc'){
                 /*comentarios de cada post*/
                 comments:comments.filter(item=>item.postId == post),
                 /*respuestas positivas al post*/
+                /*este criterio de orden es tentativo (puede cambiar despues)*/
                 positives:data[post].positive_reactions_count
             };
             posts.push(articulo);
@@ -69,11 +68,13 @@ function printAllCards(option=null,order='desc'){
             })
         }
         /*ordenamos por relevancia*/
-        /*if(relevance){
+        if(order=='relevance'){
             posts.sort(function(a,b){
                 return b.positives - a.positives;
             })
-        }*/
+        }
+        /*vaciamos al contenedor padre antes de renderizar*/
+        $('#nav-feed').empty();
         let printedArticles=0;
         for(let articulo of posts){
             /*utilizamos la libreria moment para poder realizar los filtros*/
@@ -158,7 +159,7 @@ function poblateCard(article){
 function createCard(article){
     /*string con el formato del post*/
     let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments} = article;
-    let templateCard = `<div class="card br-post post-card featured-post-card">
+    let templateCard = `<div class="card br-post post-card featured-post-card ">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
                             <div class="d-flex c-header">
