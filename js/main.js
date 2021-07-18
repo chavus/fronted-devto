@@ -50,10 +50,11 @@ function printAllCards(option=null,order='desc'){
                 /*string con los tags*/
                 tagString:data[post].tags,
                 /*comentarios de cada post*/
-                comments:comments.filter(item=>item.postId == post)
+                comments:comments.filter(item=>item.postId == post),
+                /*respuestas positivas al post*/
+                positives:data[post].positive_reactions_count
             };
             posts.push(articulo);
-            console.log(articulo);
         }
         /*si argumento order es el parametro 'desc', ordenamos los post del mas reciente al mas viejo*/
         if(order=='desc'){
@@ -62,12 +63,17 @@ function printAllCards(option=null,order='desc'){
             })
         }
         /*si argumento order es el parametro 'asc', ordenamos los post del mas viejo al mas reciente*/
-
         if(order=='asc'){
             posts.sort(function(a,b){
                 return  moment(new Date(a.created_at)).valueOf() - moment(new Date(b.created_at)).valueOf()
             })
         }
+        /*ordenamos por relevancia*/
+        /*if(relevance){
+            posts.sort(function(a,b){
+                return b.positives - a.positives;
+            })
+        }*/
         let printedArticles=0;
         for(let articulo of posts){
             /*utilizamos la libreria moment para poder realizar los filtros*/
