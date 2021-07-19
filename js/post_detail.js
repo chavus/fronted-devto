@@ -38,6 +38,7 @@ function getPost(postId) {
         url: `${BASE_URL}/posts/${postId}/.json`,
         success: response =>{
             result = response
+            console.log(`${BASE_URL}/posts/${postId}/.json`)
         },
         async: false
         })
