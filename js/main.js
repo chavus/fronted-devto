@@ -342,3 +342,25 @@ function printAllCardsSearch(busqueda,order='desc'){
     firstCard.addClass('d-block');
     return postFiltrados;
 }
+
+
+function compareYear(dateToCompare){
+    let currentDate = moment(new Date());
+    let postDate = moment(new Date(dateToCompare));
+    return currentDate.year() == postDate.year();
+}
+function compareMonth(dateToCompare){
+    let currentDate = moment(new Date());
+    let postDate = moment(new Date(dateToCompare));
+    return currentDate.year() == postDate.year() &&  currentDate.month() == postDate.month();
+}
+function compareWeek(dateToCompare){
+    let currentDate = moment(new Date());
+    let postDate = moment(new Date(dateToCompare));
+    return currentDate.year() == postDate.year() &&  currentDate.isoWeek() == postDate.isoWeek();
+}
+
+
+
+
+
