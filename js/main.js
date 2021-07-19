@@ -90,8 +90,6 @@ function createCard(article){
                             <div class="d-flex c-name">
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
-                                <p>${new Date(published_timestamp)}</p>
-                                <p>positivos: ${positives}</p>
                             </div>
                         </div>
                         <div class="card-content pl-5 pt-2">
