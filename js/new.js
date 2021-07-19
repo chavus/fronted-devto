@@ -89,7 +89,7 @@ const publishPost = postData => {
         data:JSON.stringify( postData ),
         success: response => {
             let responseKey = response.name
-            window.location.href = `/post_detail.html?key=${responseKey}`
+            window.location.href = `post_detail.html?key=${responseKey}`
         },
         error: error => {
             console.log(error)
