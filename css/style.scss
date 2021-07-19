@@ -908,11 +908,13 @@ main{
         max-width: 1280px;
         .header-nav-container{
             .logo-wrapper{
-                height: 50px;
-                width: 40px;
             }
             .page-title-wrapper{
-    
+                display: flex;
+                align-items: center;
+                p{
+                    font-weight: 400;
+                }
             }
             .nav-buttons-wrapper{
                 ul{
@@ -933,14 +935,16 @@ main{
             }
         }
         .create-post-container{
-            
+            .main-creation-container{
+
+            }
         }
     }
 }
-.btn-create-post{
+.btn-publish-post{
     height: 40px;
+    width: 94px;
     white-space: nowrap;
-    margin-left: 10px;
     font-weight: 600;
     border: none;
     background-color: $main-blue;
@@ -949,18 +953,28 @@ main{
     }
 }
 
-@media(min-width: 375px){
-
-    .button-tittle-wrapper{
-        display: none;
+.btn-save-draft{
+    height: 40px;
+    width: 94px;
+    margin-left: .3rem;
+    margin-right: .3rem;
+    white-space: nowrap;
+    font-weight: 600;
+    border: none;
+    background-color: #b5bdc4;
+    opacity: 0.7;
+    &:hover{
+        opacity: 1;
     }
 }
 
-@media (min-width: 768px){
-    .header-wrapper{
-        justify-content: space-between;
-    }
-    .button-title-wrapper{
-        display: block;
+
+
+@media(min-width: 768px){
+    
+    .post-content-container{
+        padding-left: 3rem;
+        padding-right: 3rem;
+        padding-top: 1rem;
     }
 }

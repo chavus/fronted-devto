@@ -1015,9 +1015,17 @@ main .create-post-inner {
   max-width: 1280px;
 }
 
-main .create-post-inner .header-nav-container .logo-wrapper {
-  height: 50px;
-  width: 40px;
+main .create-post-inner .header-nav-container .page-title-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+main .create-post-inner .header-nav-container .page-title-wrapper p {
+  font-weight: 400;
 }
 
 main .create-post-inner .header-nav-container .nav-buttons-wrapper ul li {
@@ -1035,33 +1043,40 @@ main .create-post-inner .header-nav-container .nav-buttons-wrapper ul li button:
   color: #3b49df;
 }
 
-.btn-create-post {
+.btn-publish-post {
   height: 40px;
+  width: 94px;
   white-space: nowrap;
-  margin-left: 10px;
   font-weight: 600;
   border: none;
   background-color: #323ebe;
 }
 
-.btn-create-post:hover {
+.btn-publish-post:hover {
   background-color: #2d37aa;
 }
 
-@media (min-width: 375px) {
-  .button-tittle-wrapper {
-    display: none;
-  }
+.btn-save-draft {
+  height: 40px;
+  width: 94px;
+  margin-left: .3rem;
+  margin-right: .3rem;
+  white-space: nowrap;
+  font-weight: 600;
+  border: none;
+  background-color: #b5bdc4;
+  opacity: 0.7;
+}
+
+.btn-save-draft:hover {
+  opacity: 1;
 }
 
 @media (min-width: 768px) {
-  .header-wrapper {
-    -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-            justify-content: space-between;
-  }
-  .button-title-wrapper {
-    display: block;
+  .post-content-container {
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: 1rem;
   }
 }
 /*# sourceMappingURL=style.css.map */
