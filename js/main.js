@@ -13,9 +13,9 @@ $(document).ready(function(){
     /*de lo conrtrario imprimimos todos los post*/
     else{
         printAllCards();
+        printAside();
     }
 })
-
 function compareYear(dateToCompare){
     let currentDate = moment(new Date());
     let postDate = moment(new Date(dateToCompare));
@@ -82,7 +82,7 @@ function poblateCard(article){
 function createCard(article){
     /*string con el formato del post*/
     let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives} = article;
-    let templateCard = `<div class="card br-post post-card featured-post-card ">
+    let templateCard = `<div class="card br-post post-card featured-post-card mb-2">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
                             <div class="d-flex c-header">
@@ -90,9 +90,6 @@ function createCard(article){
                             <div class="d-flex c-name">
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
-                                <p>${new Date(published_timestamp)}</p>
-                                <p>positivos: ${positives}</p>
-
                             </div>
                         </div>
                         <div class="card-content pl-5 pt-2">
@@ -114,6 +111,7 @@ function createCard(article){
                     </a>
                         </div>
                     <div>
+                    
                     <svg xmlns="http://www.w3.org/2000/svg" width="24"
                         height="24" role="img"
                         aria-labelledby="aavwx5vmqdgx8wvzfg593jo469ge3dnz"
@@ -279,4 +277,38 @@ function printAllCardsSearch(busqueda,order='desc'){
     return postFiltrados;
 }
 
+function createListItem(article){
+    let {title,postId,comments} = article
+    let listItemTemplate = `<li class="list-group-item">
+                                    <a href="post_detail.html?key=${postId}" class="post-list">
+                                    ${title}
+                                    </a>
+                                    <div>
+                                        <p class="text-muted l-text">${comments.length} comments</p>
+                                    </div>
+                                
+                            </li>`  
+    return  listItemTemplate;
+}
 
+function printAside(){
+    let posts = bringPosts();
+    console.log(posts)
+    let help = posts.filter(post =>{
+        return post.searchString.includes('help')
+    })
+    let news = posts.filter(post =>{
+        return post.searchString.includes('new')
+    })
+    console.log(help)
+    console.log(news)
+    $('#newsPost').empty();
+    news.forEach(post=>{
+        $('#newsPost').append(createListItem(post));
+    })
+
+    $('#helpPost').empty();
+    help.forEach(post=>{
+        $('#helpPost').append(createListItem(post));
+    })
+}
