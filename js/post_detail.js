@@ -38,7 +38,7 @@ function getPost(postId) {
         url: `${BASE_URL}/posts/${postId}/.json`,
         success: response =>{
             result = response
-            console.log(`${BASE_URL}/posts/${postId}/.json`)
+            // console.log(`${BASE_URL}/posts/${postId}/.json`)
         },
         async: false
         })
@@ -115,7 +115,7 @@ function addComment(author, content, postId){
         url: `${BASE_URL}/comments/.json`,
         data: commentJson,
         success: response =>{
-            let postComments = getCommentsByPostId(postId)
+            postComments = getCommentsByPostId(postId)
             renderComments(postComments)
             result = response
         },
@@ -171,6 +171,7 @@ function addLikeToComment(commentId){
             result = response
             // Update postData
             postComments = getCommentsByPostId(postId)
+            // console.log(postComments);
         },
         async: false
         })
@@ -183,7 +184,7 @@ function getCommentHtml(commentId, commentsData){
     let commentHtml = `
             <div class="comment-box pt-3 d-flex">
             <div class="pfp-collapse-images pr-md-0 d-flex mr-2 flex-column">
-                <img class="rounded-circle" width="24px" height="24px" src="img/comment-person.png" alt="karen">
+                <img class="rounded-circle" width="24px" height="24px" src="img/logged-in-avatar.webp" alt="karen">
                 <img class="mt-1" width="24px" height="24px" src="img/collapsed-icon.svg" alt="collapsed">
             </div>
             <div class="comment-info col-11 pl-md-0">
@@ -248,12 +249,12 @@ function renderComments(postComments, display){
 // Submit a comment (used jquery)
 $("#add-comment-btn").click(()=>{
     let commentContent = $("#comment-input").val().trim()
-    console.log(commentContent);
+    // console.log(commentContent);
     if (!commentContent){
        $("#comment-input").addClass("is-invalid")
     }else{
         let commentIdObject = addComment("Salvador Jiménez", commentContent, postId)
-        console.log(commentIdObject);
+        // console.log(commentIdObject);
         $("#comment-input").val("")
         $("html").animate(
             {scrollTop: $(`[data-comment-id=${commentIdObject.name}]`).offset().top - 170},
