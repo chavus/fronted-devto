@@ -295,12 +295,15 @@ function createListItem(article){
 
 function printAside(){
     let posts = bringPosts();
+    console.log(posts)
     let help = posts.filter(post =>{
         return post.searchString.includes('help')
     })
     let news = posts.filter(post =>{
         return post.searchString.includes('new')
     })
+    console.log(help)
+    console.log(news)
     $('#newsPost').empty();
     news.forEach(post=>{
         $('#newsPost').append(createListItem(post));
