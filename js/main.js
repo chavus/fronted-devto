@@ -280,13 +280,13 @@ function printAllCardsSearch(busqueda,order='desc'){
 }
 
 function createListItem(article){
-    let {title,postId} = article
+    let {title,postId,comments} = article
     let listItemTemplate = `<li class="list-group-item">
                                     <a href="post_detail.html?key=${postId}" class="post-list">
                                     ${title}
                                     </a>
                                     <div>
-                                        <p class="text-muted l-text">11 comments</p>
+                                        <p class="text-muted l-text">${comments.length} comments</p>
                                     </div>
                                 
                             </li>`  
