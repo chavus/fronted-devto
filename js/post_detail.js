@@ -1,6 +1,6 @@
 const BASE_URL = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
 
-//Helper function to use js as selector
+//Helper function to use js as selector (learning purposes :D)
 function getById(id){ return document.getElementById(id)}
 
 //////////////////////
@@ -43,6 +43,36 @@ function renderPostHTML(postData){
 
 }
 
+// Call to add 1 to the reaction count - PATCH
+function addToReactionCount(){
+    //-MeltVhifoieoQDV-DfX
+    let positive_reactions_count = Number(postData.positive_reactions_count) + 1
+    let postReactionObject = JSON.stringify({positive_reactions_count})
+    let result
+    $.ajax({
+        method: "PATCH",
+        url: `${BASE_URL}/posts/${postId}/.json`,
+        data: postReactionObject,
+        success: response =>{
+            result = response
+            // Update postData
+            postData = getPost(postId)
+        },
+        async: false
+        })
+    return result
+}
+
+//// Post Listeners//////
+/////////////////////////
+
+//Reactions button (to add)
+$("#reactions-btn").click(()=>{
+    let newReactionCountObject = addToReactionCount()
+    $("#reactions-count").text(newReactionCountObject.positive_reactions_count)
+})
+
+
 //////////////////////////
 //// Comments functions///
 /////////////////////////
@@ -55,7 +85,6 @@ function addComment(author, content, postId){
     commentObject["readableCommentDate"] = date.toDateString().split(" ").slice(1,3).join(" ")
     commentObject["likes"] = 0
     commentJson = JSON.stringify(commentObject)
-    console.log(commentJson);
 
     let result
     $.ajax({
@@ -139,7 +168,6 @@ function getCommentHtml(commentId, commentsData){
 // Renders a single comment at the end of section
 function renderAComment(commentId, comment){
     let commentHtml = getCommentHtml(commentId, comment)
-    console.log(commentHtml);
     $(".comment-container").append(commentHtml)
 }
 
@@ -204,6 +232,7 @@ Pending:
 - Add count to comments likes
 - Toogle show/hide comments button
 - Style of comments
+- Enable submit when there is comment content
 */
 
 
