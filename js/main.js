@@ -114,6 +114,7 @@ function createCard(article){
                     </a>
                         </div>
                     <div>
+                    
                     <svg xmlns="http://www.w3.org/2000/svg" width="24"
                         height="24" role="img"
                         aria-labelledby="aavwx5vmqdgx8wvzfg593jo469ge3dnz"
@@ -279,4 +280,32 @@ function printAllCardsSearch(busqueda,order='desc'){
     return postFiltrados;
 }
 
+function createListItem(article){
+    let {title} = article
+    let listItemTemplate = `<li class="list-group-item">
+    ${title}
+    <div>
+        <p class="text-muted l-text">11 comments</p>
+    </div>
+</li>`  
+    return  listItemTemplate;
+}
 
+
+function printAside(){
+    let posts = bringPosts();
+    let help = posts.filter(post =>{
+        return post.searchString.includes('help')
+    })
+    let news = posts.filter(post =>{
+        return post.searchString.includes('new')
+    })
+    $('#newsPost').empty();
+    news.forEach(post=>{
+        $('#newsPost').append(createListItem(post));
+    })
+
+    console.log('los post con help son ',help)
+    console.log('los post con new son ', news)
+
+}
