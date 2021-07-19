@@ -1,7 +1,30 @@
 const BASE_URL = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
 
-//Helper function to use js as selector
+//Helper function to use js as selector (learning purposes :D)
 function getById(id){ return document.getElementById(id)}
+
+
+///////////////////////
+//// On page load /////
+///////////////////////
+
+// Get ID of post from URL
+let url = new URLSearchParams(location.search)
+let postId = url.get("key")
+
+//Get post info
+let postData = getPost(postId)
+let postComments = getCommentsByPostId(postId)
+
+//Update HTML 
+renderPostHTML(postData)
+
+let commentsQty = Object.keys(postComments).length
+if (commentsQty>2){
+    renderComments(postComments, "partial")
+}else{
+    renderComments(postComments)
+}
 
 //////////////////////
 //// Post functions///
@@ -44,11 +67,40 @@ function renderPostHTML(postData){
 
 }
 
+// Call to add 1 to the reaction count - PATCH
+function addToReactionCount(){
+    let positive_reactions_count = Number(postData.positive_reactions_count) + 1
+    let postReactionObject = JSON.stringify({positive_reactions_count})
+    let result
+    $.ajax({
+        method: "PATCH",
+        url: `${BASE_URL}/posts/${postId}/.json`,
+        data: postReactionObject,
+        success: response =>{
+            result = response
+            // Update postData
+            postData = getPost(postId)
+        },
+        async: false
+        })
+    return result
+}
+
+//// Post Listeners//////
+/////////////////////////
+
+//Reactions button (to add)
+$("#reactions-btn").click(()=>{
+    let newReactionCountObject = addToReactionCount()
+    $("#reactions-count").text(newReactionCountObject.positive_reactions_count)
+})
+
+
 //////////////////////////
 //// Comments functions///
 /////////////////////////
 
-// Save a comment
+// Save a comment - POST
 function addComment(author, content, postId){
     let commentObject = {author, content, postId}
     const date = new Date()
@@ -56,7 +108,6 @@ function addComment(author, content, postId){
     commentObject["readableCommentDate"] = date.toDateString().split(" ").slice(1,3).join(" ")
     commentObject["likes"] = 0
     commentJson = JSON.stringify(commentObject)
-    console.log(commentJson);
 
     let result
     $.ajax({
@@ -73,7 +124,7 @@ function addComment(author, content, postId){
     return result
 }
 
-// Get a comment by ID
+// Get a comment by ID - GET
 function getCommentById(commentId){
     let result
     $.ajax({
@@ -87,7 +138,7 @@ function getCommentById(commentId){
     return result
 }
 
-// Get all post's comments
+// Get all post's comments - GET
 function getCommentsByPostId(postId){
     let allComments
     $.ajax({
@@ -106,6 +157,26 @@ function getCommentsByPostId(postId){
     }
     return commentsByPostId
 }
+
+// Add like to comment - PATCH
+function addLikeToComment(commentId){
+    let likes = Number(postComments[commentId].likes) + 1
+    let commentLikesObject = JSON.stringify({likes})
+    let result
+    $.ajax({
+        method: "PATCH",
+        url: `${BASE_URL}/comments/${commentId}/.json`,
+        data: commentLikesObject,
+        success: response =>{
+            result = response
+            // Update postData
+            postComments = getCommentsByPostId(postId)
+        },
+        async: false
+        })
+    return result
+}
+
 
 // Builds comment html from comment data
 function getCommentHtml(commentId, commentsData){
@@ -128,8 +199,8 @@ function getCommentHtml(commentId, commentsData){
                     </div>
                 </div>
                 <div class="comment-interaction">
-                    <button type="button" class="btn btn-light bg-white like-comment-btn" data-commentd-id=${commentId}><img src="img/heart-icon.svg" alt="heart" /><span class="font-weight-normal" > ${commentsData.likes} </span> likes</button>
-                    <button type="button" class="btn btn-light bg-white"><img src="img/comments-icon.svg" alt="comment" />0</button>
+                    <button type="button" class="btn btn-light bg-white like-comment-btn" data-comment-id=${commentId}><img src="img/heart-icon.svg" alt="heart" /><span class="font-weight-normal">${commentsData.likes}</span> likes</button>
+
                 </div>
             </div>
         </div>
@@ -140,7 +211,6 @@ function getCommentHtml(commentId, commentsData){
 // Renders a single comment at the end of section
 function renderAComment(commentId, comment){
     let commentHtml = getCommentHtml(commentId, comment)
-    console.log(commentHtml);
     $(".comment-container").append(commentHtml)
 }
 
@@ -155,10 +225,20 @@ function renderComments(postComments, display){
     }else{
         for (commentId in postComments){
             renderAComment(commentId, postComments[commentId])
+            $("#toogle-show-comments").addClass("d-none")
         }
     }
 
     $(".comments-qty").text(Object.keys(postComments).length)
+
+    // Add listener here so that all comments always have a listener
+    $(".like-comment-btn").click( click_event =>{
+        let commentId = click_event.currentTarget.dataset.commentId // js
+        // let commentId = $(click_event.target).data("comment-id") // jQuery
+        let commentLikesObject = addLikeToComment(commentId)
+        //document.querySelector(`[data-comment-id=${commentId}] span`).textContent // Js
+        $(`[data-comment-id=${commentId}] span`).text(commentLikesObject.likes)
+    })
 
 }
 
@@ -167,9 +247,24 @@ function renderComments(postComments, display){
 
 // Submit a comment (used jquery)
 $("#add-comment-btn").click(()=>{
-    let commentContent = $("#comment-input").val()
-    let ret = addComment("Salvador Jiménez", commentContent, postId)
-    $("#comment-input").val("")
+    let commentContent = $("#comment-input").val().trim()
+    console.log(commentContent);
+    if (!commentContent){
+       $("#comment-input").addClass("is-invalid")
+    }else{
+        let commentIdObject = addComment("Salvador Jiménez", commentContent, postId)
+        console.log(commentIdObject);
+        $("#comment-input").val("")
+        $("html").animate(
+            {scrollTop: $(`[data-comment-id=${commentIdObject.name}]`).offset().top - 170},
+            800)
+    }
+
+})
+
+$("#comment-input").click((e)=>{
+    //e.target.classList.remove("is-invalid") // js
+    $(e.target).removeClass("is-invalid") // jQuery
 })
 
 $("#toogle-show-comments").click(()=>{
@@ -177,34 +272,12 @@ $("#toogle-show-comments").click(()=>{
     $("#toogle-show-comments").addClass("d-none")
 })
 
-///////////////////////
-//// On page load /////
-///////////////////////
-
-// Get ID of post from URL
-let url = new URLSearchParams(location.search)
-let postId = url.get("key")
-
-//Get post info
-let postData = getPost(postId)
-let postComments = getCommentsByPostId(postId)
-
-//Update HTML 
-renderPostHTML(postData)
-
-let commentsQty = Object.keys(postComments).length
-if (commentsQty>2){
-    renderComments(postComments, "partial")
-}else{
-    renderComments(postComments)
-}
-
 /*
 Pending:
-- Add count to reaction (heart)
-- Add count to comments likes
+- Enable submit only when there is comment content
 - Toogle show/hide comments button
-- Style of comments
+- Style of comments: Buttons, width
+- Add/Remove likes/reactions
 */
 
 

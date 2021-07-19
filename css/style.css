@@ -108,6 +108,23 @@ header .navbar .btn-create-post:hover {
   background-color: #2d37aa;
 }
 
+.btn-submit {
+  background-color: #3b49df;
+  border-color: #3b49df;
+}
+
+.btn-submit:hover {
+  background-color: #2535db;
+}
+
+.discussion-comment-box {
+  padding-right: 3rem;
+}
+
+.comment-form {
+  width: 100%;
+}
+
 @media (min-width: 768px) {
   header .navbar .profile-badge {
     display: -webkit-box;
