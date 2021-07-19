@@ -35,7 +35,7 @@ $('#publish-button').click( () =>{
 })
 
 
-let asideTitle = `<div class="aside-content-wrapper" style="top: 148px; position: fixed; width: 345px;">
+let asideTitle = `<div class="aside-content-wrapper" style="top: 148px; position: fixed;">
                         <h4 class="aside-title">
                             Writing a Great Post Title
                         </h4>
@@ -44,7 +44,7 @@ let asideTitle = `<div class="aside-content-wrapper" style="top: 148px; position
                         Use keywords where appropriate to help ensure people can find your post by search.
                         </p>
                     </div>`
-let asideTagging = `<div class="aside-content-wrapper" style="top: 218px; position: fixed; width: 345px;">
+let asideTagging = `<div class="aside-content-wrapper" style="top: 218px; position: fixed;">
                             <h4 class="aside-1-title">
                                 Tagging Guidelines
                             </h4>
@@ -56,9 +56,9 @@ let asideTagging = `<div class="aside-content-wrapper" style="top: 218px; positi
                                 Some tags, such as “help” or “healthydebate”, have special posting guidelines.
                             </p>
                         </div>`
-let asideContent = `<div class="aside-content-wrapper" style="top: 354px; position: fixed; width: 345px;">
+let asideContent = `<div class="aside-content-wrapper" style="top: 354px; position: fixed;">
                         <h4 class="aside-title">
-                            Editor Basics
+                            Editor Basic
                         </h4>
                         <p class="aside-conten text-muted">
                             Use Markdown to write and format posts.<br/>
