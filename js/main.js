@@ -293,7 +293,6 @@ function createListItem(article){
     return  listItemTemplate;
 }
 
-
 function printAside(){
     let posts = bringPosts();
     let help = posts.filter(post =>{
