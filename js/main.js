@@ -319,3 +319,7 @@ $('#opennav').on('click',function(){
 $('#closenav').on('click',function(){
     $('#navbar').addClass('d-none')
 })
+
+$('#createPost').on('click',function(){
+    location.href = 'New.html'
+})
