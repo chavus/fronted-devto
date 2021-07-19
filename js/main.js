@@ -8,131 +8,61 @@ $(document).ready(function(){
     /*si existe un parametro de busqueda en la URL imprimimos los post cuyo
     searchString incluya dicho parameto */
     if(busqueda){
-        printAllCards(busqueda);    
+        printAllCardsSearch(busqueda,'relevance');    
     }
     /*de lo conrtrario imprimimos todos los post*/
     else{
         printAllCards();
     }
 })
-function printAllCards(option=null,order='desc'){
-    $.get(endPoint+'/posts/.json', function(data, status){
-        console.log("Data: " + data + "\nStatus: " + status);
-        /*vaciamos al contenedor padre antes de renderizar*/
-        $('#nav-feed').empty();
-        /*creamos un arreglo vacio donde pondremos los datos
-        que necesitamos para pintar nuestros posts*/
-        let posts = [];
-        /*consultamos los comentarios asincronamente y los guardamos 
-        en un arreglo*/
-        let comments = bringComments();
-        /*iteramos sobre el el objeto que nos traimos de nuestra api*/
-        for(let post in data){
-            let articulo = {
-                /*imagen de la parte superir del post*/
-                cover:data[post].cover_image,
-                /*avatar del usuario*/
-                user:data[post].user.profile_image_90,
-                /*nombre del usuario*/
-                name:data[post].user.name,
-                /*fecha de publicacion (formato corto)*/
-                readable_publish:data[post].readable_publish_date,
-                /*titulo del post*/
-                title:data[post].title,
-                /*arreglo con los tags*/
-                tagList:data[post].tag_list,
-                /*tiempo de lectura*/
-                reading_time_minutes:data[post].reading_time_minutes,
-                /*fecha de publicacion (formato largo)*/
-                created_at:data[post].created_at,
-                /*clave de nuestro post en nuetria API*/
-                postId:post,
-                /*string con los tags*/
-                tagString:data[post].tags,
-                /*comentarios de cada post*/
-                comments:comments.filter(item=>item.postId == post)
-            };
-            posts.push(articulo);
-            console.log(articulo);
-        }
-        /*si argumento order es el parametro 'desc', ordenamos los post del mas reciente al mas viejo*/
-        if(order=='desc'){
-            posts.sort(function(a,b){
-                return moment(new Date(b.created_at)).valueOf() - moment(new Date(a.created_at)).valueOf()
-            })
-        }
-        /*si argumento order es el parametro 'asc', ordenamos los post del mas viejo al mas reciente*/
 
-        if(order=='asc'){
-            posts.sort(function(a,b){
-                return  moment(new Date(a.created_at)).valueOf() - moment(new Date(b.created_at)).valueOf()
-            })
-        }
-        let printedArticles=0;
-        for(let articulo of posts){
-            /*utilizamos la libreria moment para poder realizar los filtros*/
-            let fecha = new Date(articulo.created_at)
-            let today = new Date();
-            let fechaMoment = moment(fecha)
-            let todayMoment = moment(today) 
-            /*creamos un string de busqueda contatenando en minusculas:
-            el nombre del autor del post,el titulo del post y el tagString*/
-            let searchString = `${articulo.name} ${articulo.title} ${articulo.tagString}`.toLowerCase();
-            switch(option){
-                /*imprimimos todos los post del mas reciente al mas viejo*/
-                case null:
-                    poblateCard(articulo)
-                    break;
-                case 'feed':
-                    poblateCard(articulo)
-                    break;
-                /*imprimimos los 5 primeros post */
-                case 'latest':
-                    if(printedArticles==5){
-                        let firstCard = $('#nav-feed .card:first-child').find('img');
-                        firstCard.addClass('d-block');
-                        return;
-                    }
-                    poblateCard(articulo);
-                    printedArticles++;
-                    break;
-                /*imprimimos todos los post que sean del ano actual*/
-                case 'year':
-                    if(fechaMoment.year() == todayMoment.year()){
-                        poblateCard(articulo)
-                        break;
-                    }
-                /*imprimimos todos los post que sean del ano actual y el mes actual*/
-                case 'month':
-                    if(fechaMoment.year() == todayMoment.year()){
-                        if(fechaMoment.month() == todayMoment.month()){
-                            poblateCard(articulo)
-                            break;
-                        }
-                    }
-                case 'week':
-                /*imprimimos todos los post que sean del ano actual y la semana actual*/
-                    if(fechaMoment.year() == todayMoment.year()){
-                        if(fechaMoment.isoWeek() == todayMoment.isoWeek()){
-                            poblateCard(articulo)
-                            break;
-                        }
-                    }
-                default:
-                /*el argumento option tambien puede recibir un string que representa
-                una palabra que buscaremos en el searchString*/
-                    if(searchString.includes(option.toLowerCase())){
-                        poblateCard(articulo)
-                        break;
-                    }
-            }
-
-        }
-        /*una vez renderizadas todos los post mostramos el cover del primer post*/
-        let firstCard = $('#nav-feed .card:first-child').find('img');
-        firstCard.addClass('d-block');
-    });
+function compareYear(dateToCompare){
+    let currentDate = moment(new Date());
+    let postDate = moment(new Date(dateToCompare));
+    return currentDate.year() == postDate.year();
 }
+function compareMonth(dateToCompare){
+    let currentDate = moment(new Date());
+    let postDate = moment(new Date(dateToCompare));
+    return currentDate.year() == postDate.year() &&  currentDate.month() == postDate.month();
+}
+function compareWeek(dateToCompare){
+    let currentDate = moment(new Date());
+    let postDate = moment(new Date(dateToCompare));
+    return currentDate.year() == postDate.year() &&  currentDate.isoWeek() == postDate.isoWeek();
+}
+
+
+
+function printAllCards(option='feed'){
+    let posts = bringPosts();
+    let postFiltrados;
+    if(option=='feed'){
+        postFiltrados=posts;
+    }
+    if(option=='week'){
+        postFiltrados=posts.filter(post=>compareWeek(post.published_timestamp));
+    }
+    if(option=='month'){
+        postFiltrados=posts.filter(post=>compareMonth(post.published_timestamp));
+    }
+    if(option=='year'){
+        postFiltrados=posts.filter(post=>compareYear(post.published_timestamp));
+    }
+    if(option=='latest'){
+        postFiltrados = posts.sort(function(a,b){
+            return moment(new Date(b.published_timestamp)).valueOf() - moment(new Date(a.published_timestamp)).valueOf()
+            })
+        postFiltrados = postFiltrados.slice(0,5);
+    }
+    $('#nav-feed').empty();
+    postFiltrados.forEach(post=>poblateCard(post))
+    let firstCard = $('#nav-feed .card:first-child').find('img');
+    firstCard.addClass('d-block');
+    return postFiltrados;
+}
+
+
 
 function poblateCard(article){
     /*creamos un string con el formato del post y lo populamos con los datos
@@ -151,8 +81,8 @@ function poblateCard(article){
 
 function createCard(article){
     /*string con el formato del post*/
-    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,created_at,postId,comments} = article;
-    let templateCard = `<div class="card br-post post-card featured-post-card">
+    let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives} = article;
+    let templateCard = `<div class="card br-post post-card featured-post-card ">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
                             <div class="d-flex c-header">
@@ -160,7 +90,8 @@ function createCard(article){
                             <div class="d-flex c-name">
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
-                                <p>${new Date(created_at)}</p>
+                                <p>${new Date(published_timestamp)}</p>
+                                <p>positivos: ${positives}</p>
 
                             </div>
                         </div>
@@ -173,6 +104,15 @@ function createCard(article){
                             </nav>
                         </div>
                         <div class=" d-flex read">
+                    
+                    <div class="d-flex">
+                    <div>
+                    <a href="post_detail.html?key=${postId}" class="post-list">
+                    <svg class="crayons-icon" width="24" height="24" 
+                        xmlns="http://www.w3.org/2000/svg"><path d="M18.884 12.595l.01.011L12 19.5l-6.894-6.894.01-.01A4.875 4.875 0 0112 5.73a4.875 4.875 0 016.884 6.865zM6.431 7.037a3.375 3.375 0 000 4.773L12 17.38l5.569-5.569a3.375 3.375 0 10-4.773-4.773L9.613 10.22l-1.06-1.062 2.371-2.372a3.375 3.375 0 00-4.492.25v.001z"></path></svg>
+                        <button class="comment"><span>${positives}</span> reactions</button>
+                    </a>
+                        </div>
                     <div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24"
                         height="24" role="img"
@@ -185,6 +125,7 @@ function createCard(article){
                         </path>
                     </svg>
                     <button class="comment"><span>${comments.length}</span> comment</button>
+                    </div>
                     </div>
                     <div class="d-flex">
                     <p class="card-text mb-0"><small class="text-muted">${reading_time_minutes}
@@ -217,10 +158,13 @@ $('#nav-tab').on('click',function(event){
             printAllCards('year');
             break;
         case 'newest':
-            printAllCards(busqueda,'desc');
+            printAllCardsSearch(busqueda,'desc');
             break;
         case 'oldest':
-            printAllCards(busqueda,'asc');
+            printAllCardsSearch(busqueda,'asc');
+            break;
+        case 'relevance':
+            printAllCardsSearch(busqueda,'relevance');
             break;
     }
     
@@ -259,3 +203,80 @@ function createCommentary(postId,author,content){
         async: true
     });
 }
+
+
+function bringPosts(){
+    $.ajax({
+        method:'GET',
+        url:endPoint+'/posts/.json',
+        success: function (result) {
+            postsObject = result;
+        },
+        async: false
+    });
+    let comments = bringComments();
+    let postsMatrix = Object.entries(postsObject);
+    let postsArray = postsMatrix.map(post=>{
+        return {
+            cover:post[1].cover_image,
+            /*avatar del usuario*/
+            user:post[1].user.profile_image_90,
+            /*nombre del usuario*/
+            name:post[1].user.name,
+            /*fecha de publicacion (formato corto)*/
+            readable_publish:post[1].readable_publish_date,
+            /*titulo del post*/
+            title:post[1].title,
+            /*arreglo con los tags*/
+            tagList:post[1].tag_list,
+            /*tiempo de lectura*/
+            reading_time_minutes:post[1].reading_time_minutes,
+            /*fecha de publicacion (formato largo)*/
+            published_timestamp:post[1].published_timestamp,
+            /*clave de nuestro post en nuetria API*/
+            postId:post[0],
+            /*string con los tags*/
+            tagString:post[1].tags,
+            /*comentarios de cada post*/
+            comments:comments.filter(item=>item.postId == post[0]),
+            /*respuestas positivas al post*/
+            /*este criterio de orden es tentativo (puede cambiar despues)*/
+            positives:post[1].positive_reactions_count,
+            searchString:`${post[1].user.name} ${post[1].tags} ${post[1].title}`.toLowerCase()
+        }
+    })
+    return postsArray;
+}
+
+function printAllCardsSearch(busqueda,order='desc'){
+    let posts = bringPosts();
+    let postFiltrados = posts.filter(post =>{
+        return post.searchString.includes(busqueda.toLowerCase());
+    }
+    )
+/*si argumento order es el parametro 'desc', ordenamos los post del mas reciente al mas viejo*/
+    if(order=='desc'){
+        postFiltrados.sort(function(a,b){
+            return moment(new Date(b.published_timestamp)).valueOf() - moment(new Date(a.published_timestamp)).valueOf()
+            })
+        }
+/*si argumento order es el parametro 'asc', ordenamos los post del mas viejo al mas reciente*/
+    if(order=='asc'){
+        postFiltrados.sort(function(a,b){
+            return  moment(new Date(a.published_timestamp)).valueOf() - moment(new Date(b.published_timestamp)).valueOf()
+        })
+    }
+/*ordenamos por relevancia*/
+    if(order=='relevance'){
+        postFiltrados.sort(function(a,b){
+            return b.positives - a.positives;
+        })
+    }
+    $('#nav-feed').empty();
+    postFiltrados.forEach(post=>poblateCard(post))
+    let firstCard = $('#nav-feed .card:first-child').find('img');
+    firstCard.addClass('d-block');
+    return postFiltrados;
+}
+
+
