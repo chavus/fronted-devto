@@ -13,9 +13,9 @@ $(document).ready(function(){
     /*de lo conrtrario imprimimos todos los post*/
     else{
         printAllCards();
+        printAside();
     }
 })
-
 function compareYear(dateToCompare){
     let currentDate = moment(new Date());
     let postDate = moment(new Date(dateToCompare));
@@ -82,7 +82,7 @@ function poblateCard(article){
 function createCard(article){
     /*string con el formato del post*/
     let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives} = article;
-    let templateCard = `<div class="card br-post post-card featured-post-card ">
+    let templateCard = `<div class="card br-post post-card featured-post-card mb-2">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
                             <div class="d-flex c-header">
@@ -92,7 +92,6 @@ function createCard(article){
                                 <p>${readable_publish}</p>
                                 <p>${new Date(published_timestamp)}</p>
                                 <p>positivos: ${positives}</p>
-
                             </div>
                         </div>
                         <div class="card-content pl-5 pt-2">
@@ -281,13 +280,16 @@ function printAllCardsSearch(busqueda,order='desc'){
 }
 
 function createListItem(article){
-    let {title} = article
+    let {title,postId} = article
     let listItemTemplate = `<li class="list-group-item">
-    ${title}
-    <div>
-        <p class="text-muted l-text">11 comments</p>
-    </div>
-</li>`  
+                                    <a href="post_detail.html?key=${postId}" class="post-list">
+                                    ${title}
+                                    </a>
+                                    <div>
+                                        <p class="text-muted l-text">11 comments</p>
+                                    </div>
+                                
+                            </li>`  
     return  listItemTemplate;
 }
 
@@ -305,7 +307,8 @@ function printAside(){
         $('#newsPost').append(createListItem(post));
     })
 
-    console.log('los post con help son ',help)
-    console.log('los post con new son ', news)
-
+    $('#helpPost').empty();
+    help.forEach(post=>{
+        $('#helpPost').append(createListItem(post));
+    })
 }
