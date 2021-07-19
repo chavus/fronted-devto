@@ -207,19 +207,19 @@ $('#nav-tab').on('click',function(event){
     let target = event.target;
     switch(target.id) {
         case 'feed':
-            printAllCards('feed');
+            printAllCards2('feed');
             break;
         case 'latest':
-            printAllCards('latest');
+            printAllCards2('latest');
             break;
         case 'week':
-            printAllCards('week');
+            printAllCards2('week');
             break;
         case 'month':
-            printAllCards('month');
+            printAllCards2('month');
             break;
         case 'year':
-            printAllCards('year');
+            printAllCards2('year');
             break;
         case 'newest':
             printAllCardsSearch(busqueda,'desc');
@@ -362,5 +362,30 @@ function compareWeek(dateToCompare){
 
 
 
-
-
+function printAllCards2(option='feed'){
+    let posts = bringPosts();
+    let postFiltrados;
+    if(option=='feed'){
+        postFiltrados=post;
+    }
+    if(option=='week'){
+        postFiltrados=posts.filter(post=>compareWeek(post.published_timestamp));
+    }
+    if(option=='month'){
+        postFiltrados=posts.filter(post=>compareMonth(post.published_timestamp));
+    }
+    if(option=='year'){
+        postFiltrados=posts.filter(post=>compareYear(post.published_timestamp));
+    }
+    if(option=='latest'){
+        postFiltrados = posts.sort(function(a,b){
+            return moment(new Date(b.published_timestamp)).valueOf() - moment(new Date(a.published_timestamp)).valueOf()
+            })
+        postFiltrados = postFiltrados.slice(0,5);
+    }
+    $('#nav-feed').empty();
+    postFiltrados.forEach(post=>poblateCard(post))
+    let firstCard = $('#nav-feed .card:first-child').find('img');
+    firstCard.addClass('d-block');
+    return postFiltrados;
+}
