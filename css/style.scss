@@ -907,8 +907,6 @@ main{
     .create-post-inner{
         max-width: 1280px;
         .header-nav-container{
-            .logo-wrapper{
-            }
             .page-title-wrapper{
                 display: flex;
                 align-items: center;
@@ -934,11 +932,6 @@ main{
                 }
             }
         }
-        .create-post-container{
-            .main-creation-container{
-
-            }
-        }
     }
 }
 .btn-publish-post{
@@ -952,6 +945,7 @@ main{
         background-color: darken($main-blue,5%);
     }
 }
+
 
 .btn-save-draft{
     height: 40px;
