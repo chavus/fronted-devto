@@ -1098,5 +1098,10 @@ main .create-post-inner .header-nav-container .nav-buttons-wrapper ul li button:
     padding-right: 3rem;
     padding-top: 1rem;
   }
+  .close-editor-wrapper {
+    position: fixed;
+    top: 13px;
+    right: 30px;
+  }
 }
 /*# sourceMappingURL=style.css.map */
