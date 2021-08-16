@@ -1,4 +1,4 @@
-const ENDPOINT = 'https://miproyecto-jorge-default-rtdb.firebaseio.com/posts/.json'
+const ENDPOINT = 'http://localhost:8080/posts/'
 
 $('#publish-button').click( () =>{
     const date = new Date()
@@ -7,17 +7,9 @@ $('#publish-button').click( () =>{
     let randomReaction = Math.floor(Math.random() * 101)
     let randomReading = Math.floor(Math.random() * 11)
 
-    let postObject = { published_timestamp: publishedAt, readable_publish_date: readableDate, 
-        published_at: publishedAt, positive_reactions_count: randomReaction, reading_time_minutes: randomReading,
-        user: {
-            github_username: "benhalpern",
-            name: "Ben Halpern",
-            profile_image: "https://res.cloudinary.com/practicaldev/image/fetch/s--Y1sq1tFG--/c_fill,f_auto,fl_progressive,h_640,q_auto,w_640/https://thepracticaldev.s3.amazonaws.com/uploads/user/profile_image/1/f451a206-11c8-4e3d-8936-143d0a7e65bb.png",
-            profile_image_90: "https://res.cloudinary.com/practicaldev/image/fetch/s--DcW51A6v--/c_fill,f_auto,fl_progressive,h_90,q_auto,w_90/https://thepracticaldev.s3.amazonaws.com/uploads/user/profile_image/1/f451a206-11c8-4e3d-8936-143d0a7e65bb.png",
-            twitter_username: "bendhalpern",
-            username: "ben",
-            website_url: "http://benhalpern.com"
-        }}
+    let postObject = { readablePublishedDate: readableDate, 
+        publishedTimestamp: publishedAt, positiveReactionsCount: randomReaction, readingTimeMinutes: randomReading,
+        writer: "6119498f73352010e062968c"}
 
     $('.publish-post').each( function(){
         let property = $(this).attr("name")
@@ -26,7 +18,7 @@ $('#publish-button').click( () =>{
         if ($(this).attr("name") == "tags"){
             let tags = $(this).val()
             let tagList = tags.split(" ")
-            postObject = { ...postObject, "tag_list":tagList}
+            postObject = { ...postObject, "tagsList":tagList}
         }
         
         postObject = {...postObject, [property] : value}
@@ -83,17 +75,22 @@ $('#content-body').click(() =>{
 })
 
 const publishPost = postData => {
+
+    console.log(postData)
+    
     $.ajax({
         type: "POST",
         url: ENDPOINT,
         data:JSON.stringify( postData ),
         success: response => {
-            let responseKey = response.name
-            window.location.href = `post_detail.html?key=${responseKey}`
+            // let responseKey = response.name
+            //window.location.href = `post_detail.html?key=${responseKey}`
+            console.log(response)
         },
         error: error => {
             console.log(error)
         },
         async:false
     });
+    
 }
