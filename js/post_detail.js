@@ -1,4 +1,4 @@
-const BASE_URL = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
+const BASE_URL = 'http://localhost:8080'
 
 //Helper function to use js as selector (learning purposes :D)
 function getById(id){ return document.getElementById(id)}
@@ -19,7 +19,8 @@ let postComments = getCommentsByPostId(postId)
 //Update HTML 
 renderPostHTML(postData)
 
-let commentsQty = Object.keys(postComments).length
+let commentsQty = postComments.length
+console.log(commentsQty)
 if (commentsQty>2){
     renderComments(postComments, "partial")
 }else{
@@ -35,32 +36,35 @@ function getPost(postId) {
     let result
     $.ajax({
         method: "GET",
-        url: `${BASE_URL}/posts/${postId}/.json`,
+        url: `${BASE_URL}/posts/${postId}`,
         success: response =>{
             result = response
             // console.log(`${BASE_URL}/posts/${postId}/.json`)
         },
         async: false
         })
+    //console.log(result)
     return result
 }
 
 // Updates Post detail html (used javascript DOM methods)
 function renderPostHTML(postData){
-    getById("title").textContent = postData.title
-    getById("cover-image").src = postData.cover_image
-    getById("content").textContent = postData.content
+    //console.log('entro al render', postData.data.getSinglePost.title)
+        
+    getById("title").textContent = postData.data.getSinglePost.title
+    getById("cover-image").src = postData.data.getSinglePost.coverImage
+    getById("content").textContent = postData.data.getSinglePost.content
 
-    getById("user-image").src = postData.user.profile_image_90
-    getById("user-name").textContent = postData.user.name
+    // getById("user-image").src = postData.user.profile_image_90
+    getById("user-name").textContent = postData.data.getSinglePost.writer.userName
 
-    getById("post-date").textContent = postData.readable_publish_date
-    getById("read-time").textContent = postData.reading_time_minutes
+    getById("post-date").textContent = postData.data.getSinglePost.readablePublishedDate
+    getById("read-time").textContent = postData.data.getSinglePost.readingTimeMinutes
 
-    getById("reactions-count").textContent = postData.positive_reactions_count
+    getById("reactions-count").textContent = postData.data.getSinglePost.positiveReactionsCount
 
     let tagsHtml = ""
-    postData.tag_list.forEach((tag, idx) => {
+    postData.data.getSinglePost.tagsList.forEach((tag, idx) => {
         tagsHtml += `<button class="btn-card-${idx+2} text" type="button">#${tag}</button> `
     });
     getById("tags-list").innerHTML = tagsHtml
@@ -143,15 +147,18 @@ function getCommentsByPostId(postId){
     let allComments
     $.ajax({
         method: "GET",
-        url: `${BASE_URL}/comments/.json`,
+        url: `${BASE_URL}/posts/${postId}`,
         success: response =>{
-            allComments = response
+            
+            allComments = response.data.getSinglePost.comments // esto ya devuelve un arreglo de objetos comentario [ {} , {} ]
+            console.log('comentarios', allComments)
         },
         async: false
         })
 
     let commentsByPostId = {}
     for (commentKey in allComments){
+        console.log(commentKey)
         let commentValues = allComments[commentKey]
         commentsByPostId = commentValues.postId === postId ? {...commentsByPostId, [commentKey]: commentValues} : commentsByPostId
     }
