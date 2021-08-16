@@ -76,16 +76,33 @@ $('#content-body').click(() =>{
 
 const publishPost = postData => {
 
-    console.log(postData)
     
+    var xmlhttp = new XMLHttpRequest();       
+    xmlhttp.open("POST", ENDPOINT,false);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.send(JSON.stringify( postData ));
+
+    const response = JSON.parse(xmlhttp.responseText);
+    if (xmlhttp.status == 200)
+    {
+        let responseKey = response.data.posted._id
+        alert('post id creado: ' + responseKey)
+        window.location.href = `post_detail.html?key=${responseKey}` 
+    }
+    
+}
+
+
+/*
+const publishPost = postData => {
+   
     $.ajax({
         type: "POST",
         url: ENDPOINT,
         data:JSON.stringify( postData ),
         success: response => {
-            // let responseKey = response.name
-            //window.location.href = `post_detail.html?key=${responseKey}`
-            console.log(response)
+            let responseKey = response.name
+            window.location.href = `post_detail.html?key=${responseKey}`            
         },
         error: error => {
             console.log(error)
@@ -94,3 +111,4 @@ const publishPost = postData => {
     });
     
 }
+*/
