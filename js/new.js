@@ -74,7 +74,7 @@ $('#content-body').click(() =>{
     $('.post-aside-container').append(asideContent);
 })
 
-const publishPost = postData => {
+const publishPost2 = postData => {
 
     
     var xmlhttp = new XMLHttpRequest();       
@@ -83,6 +83,7 @@ const publishPost = postData => {
     xmlhttp.send(JSON.stringify( postData ));
 
     const response = JSON.parse(xmlhttp.responseText);
+    console.log(response)
     if (xmlhttp.status == 200)
     {
         let responseKey = response.data.posted._id
@@ -93,22 +94,23 @@ const publishPost = postData => {
 }
 
 
-/*
 const publishPost = postData => {
-   
+  
     $.ajax({
-        type: "POST",
         url: ENDPOINT,
-        data:JSON.stringify( postData ),
+        type:"POST",
+        data: JSON.stringify( postData ),
+        contentType:"application/json; charset=utf-8",
+        dataType:"json",
         success: response => {
-            let responseKey = response.name
+            let responseKey = response.data.posted._id
+            alert('post id creado: ' + responseKey)
             window.location.href = `post_detail.html?key=${responseKey}`            
         },
         error: error => {
             console.log(error)
         },
         async:false
-    });
+      })    
     
 }
-*/
