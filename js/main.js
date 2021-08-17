@@ -1,4 +1,4 @@
-const endPoint = 'https://miproyecto-jorge-default-rtdb.firebaseio.com'
+const endPoint = 'http://localhost:8080'
 /*claves del queryString*/
 const urlParams = new URLSearchParams(location.search);
 /*cunado buscamos nos redirigimos a la vista de busqueda y pasamos el parametro
@@ -36,6 +36,7 @@ function compareWeek(dateToCompare){
 
 function printAllCards(option='feed'){
     let posts = bringPosts();
+    console.log(`desde printAllCards: ${posts}` )
     let postFiltrados;
     if(option=='feed'){
         postFiltrados=posts;
@@ -81,12 +82,14 @@ function poblateCard(article){
 
 function createCard(article){
     /*string con el formato del post*/
+    console.log(`aquÃ­ pinta la card:  ${JSON.stringify(article)}`)
     let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives} = article;
+    console.log('destructuring: ', cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives )
     let templateCard = `<div class="card br-post post-card featured-post-card mb-2">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
                             <div class="d-flex c-header">
-                            <img src=${user} alt="" class="br-100">
+                            <img src="images/pics/me and michael.jpg" alt="" class="br-100">
                             <div class="d-flex c-name">
                                 <h6 class="nickname mb-0">${name}</h6></h6>
                                 <p>${readable_publish}</p>
@@ -122,7 +125,7 @@ function createCard(article){
                             d="M10.5 5h3a6 6 0 110 12v2.625c-3.75-1.5-9-3.75-9-8.625a6 6 0 016-6zM12 15.5h1.5a4.501 4.501 0 001.722-8.657A4.5 4.5 0 0013.5 6.5h-3A4.5 4.5 0 006 11c0 2.707 1.846 4.475 6 6.36V15.5z">
                         </path>
                     </svg>
-                    <button class="comment"><span>${comments.length}</span> comment</button>
+                    <button class="comment"><span></span> comment</button>
                     </div>
                     </div>
                     <div class="d-flex">
@@ -204,46 +207,62 @@ function createCommentary(postId,author,content){
 
 
 function bringPosts(){
+    //let postsMatrix = null
+    let postsObject
     $.ajax({
         method:'GET',
-        url:endPoint+'/posts/.json',
+        url:endPoint+'/posts',
         success: function (result) {
+
             postsObject = result;
+            //postsMatrix = postsObject.data.allPosts
+            console.log(postsObject)
+            //console.log(postsObject.data.allPosts[0].title)
         },
         async: false
     });
-    let comments = bringComments();
-    let postsMatrix = Object.entries(postsObject);
+    //console.log(`Este es el postObject: ${JSON.stringify(postsObject)}`)
+    //let comments = bringComments();
+    //let postsMatrix = Object.entries(postsObject);
+
+    let postsMatrix = postsObject.data.allPosts
+    //console.log(`Este es el postmatrix: ${JSON.stringify(postsMatrix)}`)
     let postsArray = postsMatrix.map(post=>{
+        //console.log(`Este es el post: ${post}`)
         return {
-            cover:post[1].cover_image,
+            
+            cover:post.coverImage,
+            
             /*avatar del usuario*/
-            user:post[1].user.profile_image_90,
+            //user:post.writer,
             /*nombre del usuario*/
-            name:post[1].user.name,
+            name:post.writer.userName,
             /*fecha de publicacion (formato corto)*/
-            readable_publish:post[1].readable_publish_date,
+            readable_publish:post.readablePublishedDate,
             /*titulo del post*/
-            title:post[1].title,
+            //title:post[1].title,
+            title: post.title,
             /*arreglo con los tags*/
-            tagList:post[1].tag_list,
+            tagList:post.tagsList,
             /*tiempo de lectura*/
-            reading_time_minutes:post[1].reading_time_minutes,
+            reading_time_minutes:post.readingTimeMinutes,
             /*fecha de publicacion (formato largo)*/
-            published_timestamp:post[1].published_timestamp,
+            published_timestamp:post.publishedTimestamp,
             /*clave de nuestro post en nuetria API*/
-            postId:post[0],
+            postId:post._id,
             /*string con los tags*/
-            tagString:post[1].tags,
+            tagString:post.tagsList.join(' '),
             /*comentarios de cada post*/
-            comments:comments.filter(item=>item.postId == post[0]),
+            //comments:comments.filter(item=>item.postId == post[0]),
             /*respuestas positivas al post*/
             /*este criterio de orden es tentativo (puede cambiar despues)*/
-            positives:post[1].positive_reactions_count,
-            searchString:`${post[1].user.name} ${post[1].tags} ${post[1].title}`.toLowerCase()
+            positives:post.positiveReactionsCount,
+            searchString:`${post.writer.userName} ${post.tagsList.join(' ')} ${post.title}`.toLowerCase()
         }
     })
+    console.log(`Este es el post: ${JSON.stringify(postsArray)}`)
     return postsArray;
+    
 }
 
 function printAllCardsSearch(busqueda,order='desc'){
