@@ -20,7 +20,6 @@ let postComments = getCommentsByPostId(postId)
 renderPostHTML(postData)
 
 let commentsQty = postComments.length
-console.log(commentsQty)
 if (commentsQty>2){
     renderComments(postComments, "partial")
 }else{
@@ -38,33 +37,30 @@ function getPost(postId) {
         method: "GET",
         url: `${BASE_URL}/posts/${postId}`,
         success: response =>{
-            result = response
-            // console.log(`${BASE_URL}/posts/${postId}/.json`)
+            result = response.data.getSinglePost
         },
         async: false
         })
-    //console.log(result)
     return result
 }
 
 // Updates Post detail html (used javascript DOM methods)
 function renderPostHTML(postData){
-    //console.log('entro al render', postData.data.getSinglePost.title)
         
-    getById("title").textContent = postData.data.getSinglePost.title
-    getById("cover-image").src = postData.data.getSinglePost.coverImage
-    getById("content").textContent = postData.data.getSinglePost.content
+    getById("title").textContent = postData.title
+    getById("cover-image").src = postData.coverImage
+    getById("content").textContent = postData.content
 
     // getById("user-image").src = postData.user.profile_image_90
-    getById("user-name").textContent = postData.data.getSinglePost.writer.userName
+    getById("user-name").textContent = postData.writer.userName
 
-    getById("post-date").textContent = postData.data.getSinglePost.readablePublishedDate
-    getById("read-time").textContent = postData.data.getSinglePost.readingTimeMinutes
+    getById("post-date").textContent = postData.readablePublishedDate
+    getById("read-time").textContent = postData.readingTimeMinutes
 
-    getById("reactions-count").textContent = postData.data.getSinglePost.positiveReactionsCount
+    getById("reactions-count").textContent = postData.positiveReactionsCount
 
     let tagsHtml = ""
-    postData.data.getSinglePost.tagsList.forEach((tag, idx) => {
+    postData.tagsList.forEach((tag, idx) => {
         tagsHtml += `<button class="btn-card-${idx+2} text" type="button">#${tag}</button> `
     });
     getById("tags-list").innerHTML = tagsHtml
@@ -73,15 +69,16 @@ function renderPostHTML(postData){
 
 // Call to add 1 to the reaction count - PATCH
 function addToReactionCount(){
-    let positive_reactions_count = Number(postData.positive_reactions_count) + 1
-    let postReactionObject = JSON.stringify({positive_reactions_count})
+    let positiveReactionsCount = parseInt(postData.positiveReactionsCount) + 1
+    let postReactionObject = JSON.stringify({ positiveReactionsCount })
     let result
     $.ajax({
         method: "PATCH",
-        url: `${BASE_URL}/posts/${postId}/.json`,
+        url: `${BASE_URL}/posts/${postId}`,
+        contentType:"application/json; charset=utf-8",
         data: postReactionObject,
         success: response =>{
-            result = response
+            result = response.data.updatePost
             // Update postData
             postData = getPost(postId)
         },
@@ -96,7 +93,7 @@ function addToReactionCount(){
 //Reactions button (to add)
 $("#reactions-btn").click(()=>{
     let newReactionCountObject = addToReactionCount()
-    $("#reactions-count").text(newReactionCountObject.positive_reactions_count)
+    $("#reactions-count").text(newReactionCountObject.positiveReactionsCount)
 })
 
 
@@ -105,23 +102,38 @@ $("#reactions-btn").click(()=>{
 /////////////////////////
 
 // Save a comment - POST
-function addComment(author, content, postId){
-    let commentObject = {author, content, postId}
-    const date = new Date()
-    commentObject["commentDate"] = date
-    commentObject["readableCommentDate"] = date.toDateString().split(" ").slice(1,3).join(" ")
-    commentObject["likes"] = 0
+function addComment(userName, content, postId){
+    let commentObject = {userName, content}
     commentJson = JSON.stringify(commentObject)
-
     let result
     $.ajax({
         method: "POST",
-        url: `${BASE_URL}/comments/.json`,
+        url: `${BASE_URL}/comments`,
+        contentType:"application/json; charset=utf-8",
         data: commentJson,
         success: response =>{
+            addCommentToPostId(postId, response.data.postedComment._id)
             postComments = getCommentsByPostId(postId)
             renderComments(postComments)
-            result = response
+            result = response.data.postedComment
+        },
+        async: false
+        })
+    return result
+}
+
+function addCommentToPostId(postId, commentId){
+    const comments = postData.comments
+    comments.push(commentId)
+    const postComments = JSON.stringify({ comments })
+    let result
+    $.ajax({
+        method: "PATCH",
+        url: `${BASE_URL}/posts/${postId}`,
+        contentType:"application/json; charset=utf-8",
+        data: postComments,
+        success: response =>{
+            postData = response.data.updatePost
         },
         async: false
         })
@@ -133,9 +145,9 @@ function getCommentById(commentId){
     let result
     $.ajax({
         method: "GET",
-        url: `${BASE_URL}/comments/${commentId}/.json`,
+        url: `${BASE_URL}/comments/${commentId}`,
         success: response =>{
-            result = response
+            result = response.data.comment
         },
         async: false
         })
@@ -149,36 +161,31 @@ function getCommentsByPostId(postId){
         method: "GET",
         url: `${BASE_URL}/posts/${postId}`,
         success: response =>{
-            
             allComments = response.data.getSinglePost.comments // esto ya devuelve un arreglo de objetos comentario [ {} , {} ]
-            console.log('comentarios', allComments)
         },
         async: false
         })
 
-    let commentsByPostId = {}
-    for (commentKey in allComments){
-        console.log(commentKey)
-        let commentValues = allComments[commentKey]
-        commentsByPostId = commentValues.postId === postId ? {...commentsByPostId, [commentKey]: commentValues} : commentsByPostId
-    }
-    return commentsByPostId
+    allComments.forEach(comment =>{
+        comment.readableUsername = getCommentById(comment._id).userName.userName
+    })
+    return allComments
 }
 
 // Add like to comment - PATCH
 function addLikeToComment(commentId){
-    let likes = Number(postComments[commentId].likes) + 1
-    let commentLikesObject = JSON.stringify({likes})
+    let reactionsCounter = parseInt(postComments.filter((comment)=>comment._id==commentId)[0].reactionsCounter) + 1
+    let commentLikesObject = JSON.stringify({ reactionsCounter })
     let result
     $.ajax({
         method: "PATCH",
-        url: `${BASE_URL}/comments/${commentId}/.json`,
+        url: `${BASE_URL}/comments/${commentId}`,
+        contentType:"application/json; charset=utf-8",
         data: commentLikesObject,
         success: response =>{
-            result = response
+            result = response.data.updateComment
             // Update postData
             postComments = getCommentsByPostId(postId)
-            // console.log(postComments);
         },
         async: false
         })
@@ -187,7 +194,7 @@ function addLikeToComment(commentId){
 
 
 // Builds comment html from comment data
-function getCommentHtml(commentId, commentsData){
+function getCommentHtml(commentData){
     let commentHtml = `
             <div class="comment-box pt-3 d-flex">
             <div class="pfp-collapse-images pr-md-0 d-flex mr-2 flex-column">
@@ -198,16 +205,16 @@ function getCommentHtml(commentId, commentsData){
                 <div class="card">
                     <div class="card-body pt-1">
                         <div class="comment-person-info d-flex">
-                            <p class="card-text"><small class="text-muted"> <b>${commentsData.author}</b></small></p>
-                            <p class="card-text pl-1"><small class="text-muted"> ${commentsData.readableCommentDate}</small></p>
+                            <p class="card-text"><small class="text-muted"> <b>${commentData.readableUsername}</b></small></p>
+                            <p class="card-text pl-1"><small class="text-muted"> ${commentData.creationDate}</small></p>
                         </div>
                         <p>
-                        ${commentsData.content}
+                        ${commentData.content}
                         </p>
                     </div>
                 </div>
                 <div class="comment-interaction">
-                    <button type="button" class="btn btn-light bg-white like-comment-btn" data-comment-id=${commentId}><img src="img/heart-icon.svg" alt="heart" /><span class="font-weight-normal">${commentsData.likes}</span> likes</button>
+                    <button type="button" class="btn btn-light bg-white like-comment-btn" data-comment-id=${commentData._id}><img src="img/heart-icon.svg" alt="heart" /><span class="font-weight-normal">${commentData.reactionsCounter}</span> likes</button>
 
                 </div>
             </div>
@@ -217,8 +224,8 @@ function getCommentHtml(commentId, commentsData){
 }
 
 // Renders a single comment at the end of section
-function renderAComment(commentId, comment){
-    let commentHtml = getCommentHtml(commentId, comment)
+function renderAComment(commentData){
+    let commentHtml = getCommentHtml(commentData)
     $(".comment-container").append(commentHtml)
 }
 
@@ -226,15 +233,15 @@ function renderAComment(commentId, comment){
 function renderComments(postComments, display){
     $(".comment-container").empty()
     if (display == "partial"){
-        Object.keys(postComments).slice(0,2).forEach(commentId=>{
-            renderAComment(commentId, postComments[commentId])
+        postComments.slice(0,2).forEach(comment=>{
+            renderAComment(comment)
             $("#toogle-show-comments").removeClass("d-none")
         })
     }else{
-        for (commentId in postComments){
-            renderAComment(commentId, postComments[commentId])
+        postComments.forEach(comment => {
+            renderAComment(comment)
             $("#toogle-show-comments").addClass("d-none")
-        }
+        })
     }
 
     $(".comments-qty").text(Object.keys(postComments).length)
@@ -245,7 +252,7 @@ function renderComments(postComments, display){
         // let commentId = $(click_event.target).data("comment-id") // jQuery
         let commentLikesObject = addLikeToComment(commentId)
         //document.querySelector(`[data-comment-id=${commentId}] span`).textContent // Js
-        $(`[data-comment-id=${commentId}] span`).text(commentLikesObject.likes)
+        $(`[data-comment-id=${commentId}] span`).text(commentLikesObject.reactionsCounter)
     })
 
 }
@@ -256,15 +263,13 @@ function renderComments(postComments, display){
 // Submit a comment (used jquery)
 $("#add-comment-btn").click(()=>{
     let commentContent = $("#comment-input").val().trim()
-    // console.log(commentContent);
     if (!commentContent){
        $("#comment-input").addClass("is-invalid")
     }else{
-        let commentIdObject = addComment("Salvador Jiménez", commentContent, postId)
-        // console.log(commentIdObject);
+        let commentIdObject = addComment("6119476173352010e0629685", commentContent, postId)
         $("#comment-input").val("")
         $("html").animate(
-            {scrollTop: $(`[data-comment-id=${commentIdObject.name}]`).offset().top - 170},
+            {scrollTop: $(`[data-comment-id=${commentIdObject._id}]`).offset().top - 170},
             800)
     }
 
