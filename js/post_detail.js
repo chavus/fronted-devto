@@ -1,5 +1,15 @@
 const BASE_URL = 'http://localhost:8080'
 
+const tokenArray = ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMTk0OThmNzMzNTIwMTBlMDYyOTY4YyIsImlhdCI6MTYyOTI0ODExNSwiZXhwIjoxNjI5ODUyOTE1fQ.aTn_N0SS-QdNDWBxrH8KsztEWN5e0Tzx7fEqFeA1vvk","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMTk0NzYxNzMzNTIwMTBlMDYyOTY4NSIsImlhdCI6MTYyOTI1MDI1MSwiZXhwIjoxNjI5ODU1MDUxfQ.Rom2bzH5UBX43lsLAZV-CWhHAk3ro7x_eFIOjTzHCeQ", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMTk0NmU5NzMzNTIwMTBlMDYyOTY4MSIsImlhdCI6MTYyOTI1MDMxNiwiZXhwIjoxNjI5ODU1MTE2fQ.sJrH4d3xztm9LZWv1ZobcWLg1qJr6DVg4V1WbcW5C7U",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMTk0NjUzNzMzNTIwMTBlMDYyOTY3ZSIsImlhdCI6MTYyOTI1MDM1MCwiZXhwIjoxNjI5ODU1MTUwfQ.hYdAOckRvl0sLZwXN91nrKRy1H_CPOnHF6q5_MBfHDM"]
+
+function getRandomToken() {
+    return tokenArray[Math.floor(Math.random() * (4 - 0)) + 0]
+  }
+
+const token = getRandomToken()
+
+
 //Helper function to use js as selector (learning purposes :D)
 function getById(id){ return document.getElementById(id)}
 
@@ -76,6 +86,7 @@ function addToReactionCount(){
         method: "PATCH",
         url: `${BASE_URL}/posts/${postId}`,
         contentType:"application/json; charset=utf-8",
+        headers: {'Authorization': token},
         data: postReactionObject,
         success: response =>{
             result = response.data.updatePost
@@ -131,6 +142,7 @@ function addCommentToPostId(postId, commentId){
         method: "PATCH",
         url: `${BASE_URL}/posts/${postId}`,
         contentType:"application/json; charset=utf-8",
+        headers: {'Authorization': token},
         data: postComments,
         success: response =>{
             postData = response.data.updatePost
@@ -206,7 +218,7 @@ function getCommentHtml(commentData){
                     <div class="card-body pt-1">
                         <div class="comment-person-info d-flex">
                             <p class="card-text"><small class="text-muted"> <b>${commentData.readableUsername}</b></small></p>
-                            <p class="card-text pl-1"><small class="text-muted"> ${commentData.creationDate}</small></p>
+                            <p class="card-text pl-1"><small class="text-muted"> ${commentData.readableCreationDate}</small></p>
                         </div>
                         <p>
                         ${commentData.content}
