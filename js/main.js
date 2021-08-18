@@ -215,14 +215,15 @@ function bringPosts(){
         success: function (result) {
 
             postsObject = result;
-            //postsMatrix = postsObject.data.allPosts
+             //postsMatrix = postsObject.data.allPosts
             console.log(postsObject)
             //console.log(postsObject.data.allPosts[0].title)
         },
         async: false
     });
-    //console.log(`Este es el postObject: ${JSON.stringify(postsObject)}`)
-    //let comments = bringComments();
+        //console.log(`Este es el postObject: ${JSON.stringify(postsObject)}`)
+    
+        //let comments = bringComments();
     //let postsMatrix = Object.entries(postsObject);
 
     let postsMatrix = postsObject.data.allPosts
