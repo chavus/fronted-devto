@@ -215,14 +215,15 @@ function bringPosts(){
         success: function (result) {
 
             postsObject = result;
-            //postsMatrix = postsObject.data.allPosts
+             //postsMatrix = postsObject.data.allPosts
             console.log(postsObject)
             //console.log(postsObject.data.allPosts[0].title)
         },
         async: false
     });
-    //console.log(`Este es el postObject: ${JSON.stringify(postsObject)}`)
-    //let comments = bringComments();
+        //console.log(`Este es el postObject: ${JSON.stringify(postsObject)}`)
+    
+        //let comments = bringComments();
     //let postsMatrix = Object.entries(postsObject);
 
     let postsMatrix = postsObject.data.allPosts
@@ -254,7 +255,10 @@ function bringPosts(){
             tagString:post.tagsList.join(' '),
             /*comentarios de cada post*/
             comments: post.comments.length,
+<<<<<<< HEAD
             //comments:comments.filter(item=>item.postId == post[0]),
+=======
+>>>>>>> 8f5a8b035e62da88fc6bae8f9edd191d94edf1c5
             /*respuestas positivas al post*/
             /*este criterio de orden es tentativo (puede cambiar despues)*/
             positives:post.positiveReactionsCount,

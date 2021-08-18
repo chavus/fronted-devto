@@ -69,6 +69,14 @@ function renderPostHTML(postData){
 
     getById("reactions-count").textContent = postData.positiveReactionsCount
 
+    getById("postUser").textContent = postData.writer.name
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ]
+    var f = new Date(postData.writer.joinDate)
+    
+    getById("joinDate").textContent = monthNames[f.getMonth()] + ' ' + f.getDate() + "," + f.getFullYear()
     let tagsHtml = ""
     postData.tagsList.forEach((tag, idx) => {
         tagsHtml += `<button class="btn-card-${idx+2} text" type="button">#${tag}</button> `
