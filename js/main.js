@@ -36,7 +36,7 @@ function compareWeek(dateToCompare){
 
 function printAllCards(option='feed'){
     let posts = bringPosts();
-    console.log(`desde printAllCards: ${posts}` )
+    //console.log(`desde printAllCards: ${posts}` )
     let postFiltrados;
     if(option=='feed'){
         postFiltrados=posts;
@@ -82,9 +82,9 @@ function poblateCard(article){
 
 function createCard(article){
     /*string con el formato del post*/
-    console.log(`aquÃ­ pinta la card:  ${JSON.stringify(article)}`)
+    //console.log(`aquÃ­ pinta la card:  ${JSON.stringify(article)}`)
     let {cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives} = article;
-    console.log('destructuring: ', cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives )
+    //console.log('destructuring: ', cover,user,name,readable_publish,title,tagList,reading_time_minutes,published_timestamp,postId,comments,positives )
     let templateCard = `<div class="card br-post post-card featured-post-card mb-2">
                         <img src=${cover} class="card-img-top d-none" alt="...">
                         <div class="card-body">
@@ -199,7 +199,7 @@ function createCommentary(postId,author,content){
         url:endPoint+'/comments/.json',
         data:JSON.stringify({postId,author,content}),
         success: function (result) {
-            console.log(result);
+            //console.log(result);
         },
         async: true
     });
@@ -216,7 +216,7 @@ function bringPosts(){
 
             postsObject = result;
              //postsMatrix = postsObject.data.allPosts
-            console.log(postsObject)
+            //console.log(postsObject)
             //console.log(postsObject.data.allPosts[0].title)
         },
         async: false
@@ -255,17 +255,13 @@ function bringPosts(){
             tagString:post.tagsList.join(' '),
             /*comentarios de cada post*/
             comments: post.comments.length,
-<<<<<<< HEAD
-            //comments:comments.filter(item=>item.postId == post[0]),
-=======
->>>>>>> 8f5a8b035e62da88fc6bae8f9edd191d94edf1c5
             /*respuestas positivas al post*/
             /*este criterio de orden es tentativo (puede cambiar despues)*/
             positives:post.positiveReactionsCount,
             searchString:`${post.writer.userName} ${post.tagsList.join(' ')} ${post.title}`.toLowerCase()
         }
     })
-    console.log(`Este es el post: ${JSON.stringify(postsArray)}`)
+    //console.log(`Este es el post: ${JSON.stringify(postsArray)}`)
     return postsArray;
     
 }
@@ -317,15 +313,15 @@ function createListItem(article){
 /*agregamos la funcion que renderiza el aside*/
 function printAside(){
     let posts = bringPosts();
-    console.log(posts)
+    //console.log(posts)
     let help = posts.filter(post =>{
         return post.searchString.includes('help')
     })
     let news = posts.filter(post =>{
         return post.searchString.includes('new')
     })
-    console.log(help)
-    console.log(news)
+    //console.log(help)
+    //console.log(news)
     $('#newsPost').empty();
     news.forEach(post=>{
         $('#newsPost').append(createListItem(post));
